@@ -168,6 +168,10 @@ The UI follows the premium Alex Bender aesthetic:
 - Generous whitespace
 - Fluid animations
 
+## Credits
+
+Initial codebase architecture and implementation assisted by Claude (Anthropic).
+
 ## License
 
 MIT
