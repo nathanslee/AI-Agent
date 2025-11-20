@@ -8,7 +8,8 @@ from .models import (
     CreateDatabaseRequest, DatabaseResponse,
     ExecuteSQLRequest, NaturalLanguageRequest, InsertDataRequest,
     SuggestExpirationRequest, CategorizeItemRequest,
-    ExchangeTokenRequest, SyncTransactionsRequest
+    ExchangeTokenRequest, SyncTransactionsRequest,
+    GenerateSchemaRequest, CreateDatabaseWithSchemaRequest
 )
 from .auth import hash_password, verify_password, create_access_token, get_current_user_id
 from .database import db_manager
@@ -17,7 +18,7 @@ from .sql_validator import sql_validator
 from .plaid_integration import plaid_integration
 
 app = FastAPI(
-    title="AI Database Assistant API",
+    title="DataBuddy API",
     description="AI-powered per-user database management system",
     version="1.0.0"
 )
@@ -131,6 +132,52 @@ async def create_database(
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
 
+@app.post("/api/databases/create-with-schema", response_model=DatabaseResponse)
+async def create_database_with_schema(
+    request: CreateDatabaseWithSchemaRequest,
+    user_id: str = Depends(get_current_user_id)
+):
+    """Create a new database from a provided schema"""
+    try:
+        # Make a mutable copy of the schema
+        schema = dict(request.schema)
+
+        # Filter out disabled fields
+        enabled_fields = [field for field in schema.get("fields", []) if field.get("enabled", True)]
+
+        # Remove the 'enabled' key from fields
+        cleaned_fields = []
+        for field in enabled_fields:
+            field_copy = dict(field)
+            field_copy.pop("enabled", None)
+            cleaned_fields.append(field_copy)
+
+        # Update schema with cleaned fields
+        schema["fields"] = cleaned_fields
+
+        # Create the database (this will update schema["database_name"] internally)
+        db_id = db_manager.create_user_database(
+            user_id=user_id,
+            db_name=schema["database_name"],
+            display_name=schema["display_name"],
+            schema=schema
+        )
+
+        # Get the created database to return the correct schema
+        db_info = db_manager.get_database_by_id(db_id, user_id)
+
+        return DatabaseResponse(
+            id=db_info["id"],
+            db_name=db_info["db_name"],
+            display_name=db_info["display_name"],
+            schema=db_info["schema"],
+            created_at=db_info["created_at"]
+        )
+
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+
+
 @app.delete("/api/databases/{db_id}")
 async def delete_database(db_id: str, user_id: str = Depends(get_current_user_id)):
     """Delete a database"""
@@ -226,6 +273,8 @@ async def execute_natural_language(
         if not db_info:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Database not found")
 
+        print(f"DEBUG: Database schema: {db_info['schema']}")
+
         # Get sample data for context
         existing_data = db_manager.get_all_data(request.db_id, user_id)
 
@@ -235,6 +284,8 @@ async def execute_natural_language(
             db_info["schema"],
             existing_data[:5]
         )
+
+        print(f"DEBUG: Generated SQL: {sql_result['sql']}")
 
         # Validate SQL for safety
         is_valid, error_message = sql_validator.validate_sql(sql_result["sql"])
@@ -260,6 +311,9 @@ async def execute_natural_language(
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
     except Exception as e:
+        print(f"ERROR in execute_natural_language: {type(e).__name__}: {str(e)}")
+        import traceback
+        traceback.print_exc()
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
 
@@ -295,6 +349,19 @@ async def categorize_item(
             request.available_categories
         )
         return {"category": category}
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+
+
+@app.post("/api/ai/generate-schema")
+async def generate_schema(
+    request: GenerateSchemaRequest,
+    user_id: str = Depends(get_current_user_id)
+):
+    """Generate database schema from description without creating database"""
+    try:
+        schema = ai_agent.generate_database_schema(request.description)
+        return {"schema": schema}
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
@@ -420,7 +487,7 @@ async def root():
     """Health check endpoint"""
     return {
         "status": "healthy",
-        "service": "AI Database Assistant API",
+        "service": "DataBuddy API",
         "version": "1.0.0"
     }
 

@@ -23,6 +23,12 @@ class UserResponse(BaseModel):
 class CreateDatabaseRequest(BaseModel):
     description: str
 
+class GenerateSchemaRequest(BaseModel):
+    description: str
+
+class CreateDatabaseWithSchemaRequest(BaseModel):
+    schema: Dict[str, Any]
+
 class DatabaseSchema(BaseModel):
     database_name: str
     display_name: str

@@ -48,7 +48,7 @@ Output ONLY valid JSON in this exact format:
 }"""
 
         response = client.chat.completions.create(
-            model="gpt-4-turbo-preview",
+            model="gpt-4o-mini",
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_description}
@@ -89,24 +89,29 @@ Output ONLY valid JSON in this exact format:
             for f in fields
         ])
 
-        system_prompt = f"""You are an expert SQL query generator. Convert natural language commands into safe, valid SQLite queries.
+        system_prompt = f"""You are an expert SQL query generator. Convert natural language commands into safe, valid PostgreSQL queries.
 
-Database: {table_name}
+Table Name: {table_name}
 Fields:
 {fields_description}
 
-Rules:
-1. Generate valid SQLite syntax
-2. Use ISO 8601 date format (YYYY-MM-DD) for dates
-3. For INSERT, provide reasonable defaults for missing fields
-4. For SELECT, use appropriate WHERE clauses
-5. For UPDATE/DELETE, always include a WHERE clause
-6. Use TODAY as {datetime.now().strftime('%Y-%m-%d')}
-7. Infer values intelligently (e.g., "bought today" means date_bought = TODAY)
+CRITICAL RULES:
+1. You MUST use the EXACT table name "{table_name}" in all SQL queries
+2. DO NOT simplify or shorten the table name - use it EXACTLY as provided above
+3. The database has an 'id' field (TEXT PRIMARY KEY) and 'created_at' field (TIMESTAMP) that are auto-managed. DO NOT include them in INSERT statements
+4. Generate valid PostgreSQL syntax
+5. Use ISO 8601 date format (YYYY-MM-DD) for dates
+6. For INSERT, DO NOT include 'id' or 'created_at' fields - they are auto-generated
+7. For INSERT, only include the user-defined fields from the schema above
+8. For SELECT, use appropriate WHERE clauses
+9. For UPDATE/DELETE, always include a WHERE clause
+10. Use TODAY as {datetime.now().strftime('%Y-%m-%d')}
+11. Infer values intelligently (e.g., "bought today" means purchase_date = TODAY, "yesterday" means purchase_date = TODAY - 1 day)
+12. Parse natural language carefully to extract field values
 
 Output ONLY valid JSON:
 {{
-  "sql": "the SQL query",
+  "sql": "the SQL query using the EXACT table name {table_name}",
   "operation": "INSERT|SELECT|UPDATE|DELETE",
   "requires_confirmation": true if destructive,
   "explanation": "what this query does in plain English"
@@ -117,7 +122,7 @@ Output ONLY valid JSON:
             user_message += f"\n\nExisting data sample:\n{json.dumps(existing_data_sample[:3], indent=2)}"
 
         response = client.chat.completions.create(
-            model="gpt-4-turbo-preview",
+            model="gpt-4o-mini",
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_message}
@@ -164,7 +169,7 @@ Output ONLY valid JSON:
             user_message += f"\nCategory: {item_type}"
 
         response = client.chat.completions.create(
-            model="gpt-4-turbo-preview",
+            model="gpt-4o-mini",
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_message}
@@ -212,7 +217,7 @@ Output ONLY valid JSON:
             user_message += f"\n\nExisting categories to choose from: {', '.join(available_categories)}"
 
         response = client.chat.completions.create(
-            model="gpt-4-turbo-preview",
+            model="gpt-4o-mini",
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_message}
@@ -268,7 +273,7 @@ Output ONLY valid JSON with field mappings:
         user_message = f"Plaid Transaction:\n{json.dumps(transaction, indent=2)}"
 
         response = client.chat.completions.create(
-            model="gpt-4-turbo-preview",
+            model="gpt-4o-mini",
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_message}
@@ -314,7 +319,7 @@ Output ONLY valid JSON:
         user_message = f"Schema:\n{json.dumps(schema, indent=2)}\n\nSample data:\n{json.dumps(data_sample[:5], indent=2)}"
 
         response = client.chat.completions.create(
-            model="gpt-4-turbo-preview",
+            model="gpt-4o-mini",
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_message}

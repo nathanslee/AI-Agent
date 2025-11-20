@@ -37,6 +37,9 @@ export const databaseAPI = {
   create: (description: string) =>
     api.post('/api/databases/create', { description }),
 
+  createWithSchema: (schema: any) =>
+    api.post('/api/databases/create-with-schema', { schema }),
+
   get: (dbId: string) =>
     api.get(`/api/databases/${dbId}`),
 
@@ -59,6 +62,9 @@ export const dataAPI = {
 };
 
 export const aiAPI = {
+  generateSchema: (description: string) =>
+    api.post('/api/ai/generate-schema', { description }),
+
   suggestExpiration: (itemName: string, itemType?: string) =>
     api.post('/api/ai/suggest-expiration', { item_name: itemName, item_type: itemType }),
 

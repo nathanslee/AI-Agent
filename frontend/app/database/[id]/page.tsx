@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { databaseAPI, dataAPI } from "@/lib/api";
 import { isAuthenticated } from "@/lib/auth";
-import { ArrowLeft, Plus, Send, Table as TableIcon, Sparkles } from "lucide-react";
+import { ArrowLeft, Plus, Send, Table as TableIcon, Sparkles, Wand2 } from "lucide-react";
 
 export default function DatabasePage() {
   const router = useRouter();
@@ -24,6 +24,97 @@ export default function DatabasePage() {
   const [submitting, setSubmitting] = useState(false);
   const [activeTab, setActiveTab] = useState<"table" | "form" | "command">("table");
   const [commandResult, setCommandResult] = useState<any>(null);
+
+  // Helper function to format field names
+  const formatFieldName = (name: string) => {
+    return name
+      .split('_')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
+  };
+
+  // Auto-fill category using AI
+  const handleAICategory = async (fieldName: string) => {
+    const itemName = formData['name'] || formData['item'] || formData['item_name'];
+    if (!itemName) {
+      alert('Please enter an item name first');
+      return;
+    }
+
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/ai/categorize`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({
+          item_name: itemName,
+          available_categories: []
+        })
+      });
+
+      const data = await response.json();
+      setFormData({ ...formData, [fieldName]: data.category });
+    } catch (error) {
+      console.error('Failed to get AI suggestion:', error);
+    }
+  };
+
+  // Auto-fill expiration date using AI
+  const handleAIExpiration = async (fieldName: string) => {
+    const itemName = formData['name'] || formData['item'] || formData['item_name'];
+    const itemType = formData['food_type'] || formData['type'] || formData['category'];
+
+    if (!itemName) {
+      alert('Please enter an item name first');
+      return;
+    }
+
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/ai/suggest-expiration`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({
+          item_name: itemName,
+          item_type: itemType || null
+        })
+      });
+
+      const data = await response.json();
+      setFormData({ ...formData, [fieldName]: data.expiration_date });
+    } catch (error) {
+      console.error('Failed to get AI suggestion:', error);
+    }
+  };
+
+  // Auto-fill description using AI
+  const handleAIDescription = async (fieldName: string) => {
+    const itemName = formData['name'] || formData['item'] || formData['item_name'];
+    if (!itemName) {
+      alert('Please enter an item name first');
+      return;
+    }
+
+    try {
+      // Generate a simple description based on available fields
+      const otherFields = Object.entries(formData)
+        .filter(([key, value]) => value && key !== 'name' && key !== 'item' && key !== 'item_name' && key !== fieldName)
+        .map(([key, value]) => `${formatFieldName(key)}: ${value}`)
+        .join(', ');
+
+      const description = otherFields
+        ? `${itemName} - ${otherFields}`
+        : `${itemName}`;
+
+      setFormData({ ...formData, [fieldName]: description });
+    } catch (error) {
+      console.error('Failed to generate description:', error);
+    }
+  };
 
   useEffect(() => {
     if (!isAuthenticated()) {
@@ -163,7 +254,7 @@ export default function DatabasePage() {
             onClick={() => setActiveTab("command")}
           >
             <Sparkles className="w-4 h-4 mr-2" />
-            Natural Language
+            AI Query
           </Button>
         </div>
 
@@ -198,7 +289,7 @@ export default function DatabasePage() {
                               key={field.name}
                               className="text-left py-3 px-4 font-semibold text-sm"
                             >
-                              {field.name}
+                              {formatFieldName(field.name)}
                             </th>
                           ))}
                         </tr>
@@ -239,20 +330,66 @@ export default function DatabasePage() {
                     {database.schema.fields?.map((field: any) => (
                       <div key={field.name} className="space-y-2">
                         <Label htmlFor={field.name}>
-                          {field.name}
+                          {formatFieldName(field.name)}
                           {!field.optional && <span className="text-red-500 ml-1">*</span>}
                         </Label>
-                        <Input
-                          id={field.name}
-                          type={field.type === "INTEGER" || field.type === "REAL" ? "number" : "text"}
-                          step={field.type === "REAL" ? "0.01" : undefined}
-                          value={formData[field.name] || ""}
-                          onChange={(e) =>
-                            setFormData({ ...formData, [field.name]: e.target.value })
-                          }
-                          required={!field.optional}
-                          disabled={submitting}
-                        />
+                        <div className="flex gap-2">
+                          <Input
+                            id={field.name}
+                            type={
+                              field.type === "INTEGER" || field.type === "REAL"
+                                ? "number"
+                                : field.name.toLowerCase().includes("date") || field.name.toLowerCase().includes("expiration")
+                                ? "date"
+                                : "text"
+                            }
+                            step={field.type === "REAL" ? "0.01" : undefined}
+                            value={formData[field.name] || ""}
+                            onChange={(e) =>
+                              setFormData({ ...formData, [field.name]: e.target.value })
+                            }
+                            required={!field.optional}
+                            disabled={submitting}
+                            className="flex-1"
+                          />
+                          {(field.name.toLowerCase().includes("category") ||
+                            field.name.toLowerCase().includes("type")) && (
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="icon"
+                              onClick={() => handleAICategory(field.name)}
+                              disabled={submitting}
+                              title="AI suggest category"
+                            >
+                              <Wand2 className="w-4 h-4" />
+                            </Button>
+                          )}
+                          {field.name.toLowerCase().includes("expiration") && (
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="icon"
+                              onClick={() => handleAIExpiration(field.name)}
+                              disabled={submitting}
+                              title="AI suggest expiration date"
+                            >
+                              <Wand2 className="w-4 h-4" />
+                            </Button>
+                          )}
+                          {field.name.toLowerCase().includes("description") && (
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="icon"
+                              onClick={() => handleAIDescription(field.name)}
+                              disabled={submitting}
+                              title="AI generate description"
+                            >
+                              <Wand2 className="w-4 h-4" />
+                            </Button>
+                          )}
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -270,13 +407,13 @@ export default function DatabasePage() {
             </Card>
           )}
 
-          {/* Natural Language Command */}
+          {/* AI Command */}
           {activeTab === "command" && (
             <Card className="glass-card">
               <CardHeader>
-                <CardTitle>Natural Language Commands</CardTitle>
+                <CardTitle>AI Commands</CardTitle>
                 <CardDescription>
-                  Use plain English to query or modify your data
+                  Use plain English to query or modify your data with AI
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">

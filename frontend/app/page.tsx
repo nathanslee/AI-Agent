@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Database, Sparkles, Zap, Shield } from "lucide-react";
@@ -51,30 +52,21 @@ export default function HomePage() {
             </div>
           </motion.div>
 
-          {/* Right Column - 3D Visual */}
+          {/* Right Column - Hero Image */}
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.8, delay: 0.2 }}
             className="relative"
           >
-            <div className="glass-card p-8 card-3d ambient-light">
-              <div className="space-y-4">
-                <div className="h-4 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full w-3/4" />
-                <div className="h-4 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full w-full" />
-                <div className="h-4 bg-gradient-to-r from-pink-400 to-purple-400 rounded-full w-5/6" />
-                <div className="space-y-2 pt-4">
-                  {[1, 2, 3].map((i) => (
-                    <div key={i} className="flex gap-2">
-                      <div className="w-12 h-12 rounded-2xl bg-white shadow-soft" />
-                      <div className="flex-1 space-y-2">
-                        <div className="h-2 bg-gray-200 rounded-full w-2/3" />
-                        <div className="h-2 bg-gray-200 rounded-full w-1/2" />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
+            <div className="relative w-full aspect-square">
+              <Image
+                src="/hero-image.png"
+                alt="AI Database Management Illustration"
+                fill
+                className="object-contain drop-shadow-2xl"
+                priority
+              />
             </div>
           </motion.div>
         </div>

@@ -1,25 +1,67 @@
-# AI Database Assistant
+# DataBuddy
 
-A premium full-stack AI-powered database assistant with per-user storage, natural language interfaces, and Plaid integration.
+A premium full-stack AI-powered database assistant that lets users create and manage custom databases using natural language. Built with modern technologies and featuring a beautiful, responsive UI.
+
+## 🎯 What Makes This Special
+
+- **Zero SQL Required**: Create databases and query data using plain English
+- **AI-Powered**: GPT-4o-mini generates schemas, SQL queries, and intelligent suggestions
+- **Per-User Isolation**: Each user gets their own secure, isolated database tables
+- **Banking Integration**: Sync transactions from your bank accounts via Plaid
+- **Beautiful UI**: Premium design inspired by Alex Bender's aesthetic
+- **Production-Ready**: Built with Supabase PostgreSQL, FastAPI, and Next.js 14
+
+## 🚀 Quick Start
+
+Want to get started immediately? Check out [QUICKSTART.md](QUICKSTART.md) for a streamlined setup guide!
+
+For detailed Supabase setup instructions, see [SUPABASE_SETUP.md](SUPABASE_SETUP.md).
 
 ## Architecture
 
 - **Frontend**: Next.js 14 (App Router) + TailwindCSS + shadcn/ui
 - **Backend**: FastAPI + Python
-- **Database**: SQLite (per-user isolated databases)
-- **AI**: OpenAI GPT-4
+- **Database**: Supabase PostgreSQL (per-user isolated tables)
+- **AI**: OpenAI GPT-4o-mini
 - **Banking**: Plaid API
 
 ## Features
 
-- ✅ User authentication with JWT
-- ✅ Per-user isolated database storage
-- ✅ Natural language database creation
-- ✅ Dynamic UI form generation
-- ✅ AI-powered SQL generation
-- ✅ Plaid banking integration
-- ✅ Smart suggestions (expiration dates, categories)
+### Core Features
+- ✅ User authentication with JWT and bcrypt password hashing
+- ✅ Per-user isolated database storage with Supabase PostgreSQL
+- ✅ Natural language database creation using GPT-4o-mini
+- ✅ Dynamic UI form generation based on schema
+- ✅ AI-powered natural language to SQL query conversion
+- ✅ Database management (create, delete, view)
+
+### AI-Powered Features
+- ✅ Smart schema generation from natural language descriptions
+- ✅ Intelligent field suggestions and auto-population
+- ✅ Auto-categorization of items
+- ✅ Expiration date predictions for food items
+- ✅ AI-generated descriptions for database entries
+- ✅ Natural language query interface
+
+### Schema Customization
+- ✅ Add, remove, and edit database fields
+- ✅ Enable/disable fields before creation
+- ✅ User-friendly field type labels (Number, Text, Date, etc.)
+- ✅ Optional vs required field configuration
+- ✅ Real-time schema preview
+
+### Banking Integration
+- ✅ Plaid banking integration for transaction sync
+- ✅ Automatic transaction mapping to database schema
+- ✅ Secure token management
+
+### Design & UX
 - ✅ Premium Alex Bender-inspired design
+- ✅ Custom hero image on landing page
+- ✅ Smooth animations with Framer Motion
+- ✅ Responsive design for mobile and desktop
+- ✅ Glass morphism and 3D effects
+- ✅ Modern typography with Inter Tight font
 
 ## Project Structure
 
@@ -28,17 +70,14 @@ A premium full-stack AI-powered database assistant with per-user storage, natura
 ├── backend/              # FastAPI backend
 │   ├── app/
 │   │   ├── main.py
-│   │   ├── database.py
+│   │   ├── database.py  # PostgreSQL/Supabase integration
 │   │   ├── models.py
 │   │   ├── auth.py
 │   │   ├── ai_agent.py
 │   │   ├── sql_validator.py
 │   │   └── plaid_integration.py
-│   ├── databases/        # User database storage
-│   │   ├── global.db
-│   │   └── user_<id>/
 │   ├── requirements.txt
-│   └── .env
+│   └── .env             # Contains DATABASE_URL for Supabase
 │
 └── frontend/             # Next.js frontend
     ├── app/
@@ -51,24 +90,30 @@ A premium full-stack AI-powered database assistant with per-user storage, natura
 
 ### Backend Setup
 
-1. Navigate to backend:
+1. **Set up Supabase** (see SUPABASE_SETUP.md for detailed guide):
+   - Create account at https://supabase.com
+   - Create new project
+   - Get your DATABASE_URL from Project Settings → Database
+
+2. Navigate to backend:
 ```bash
 cd backend
 ```
 
-2. Create virtual environment:
+3. Create virtual environment:
 ```bash
 python -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
 ```
 
-3. Install dependencies:
+4. Install dependencies:
 ```bash
 pip install -r requirements.txt
 ```
 
-4. Create `.env` file:
+5. Create `.env` file:
 ```env
+DATABASE_URL=postgresql://postgres:[PASSWORD]@db.xxxxx.supabase.co:5432/postgres
 OPENAI_API_KEY=your_openai_key
 PLAID_CLIENT_ID=your_plaid_client_id
 PLAID_SECRET=your_plaid_secret
@@ -76,10 +121,12 @@ PLAID_ENV=sandbox
 JWT_SECRET=your_super_secret_jwt_key
 ```
 
-5. Run backend:
+6. Run backend:
 ```bash
 uvicorn app.main:app --reload --port 8000
 ```
+
+The database tables will be created automatically on first startup!
 
 ### Frontend Setup
 
@@ -139,9 +186,9 @@ http://localhost:3000
 
 ### What YOU Must Provide
 
-1. API keys in `.env` files
-2. Ensure `backend/databases/` folder exists
-3. Secure hosting environment for deployment
+1. Supabase project and DATABASE_URL
+2. API keys in `.env` files
+3. Secure hosting environment for deployment (Vercel, Render, Fly.io, etc.)
 
 ### What Users Provide
 

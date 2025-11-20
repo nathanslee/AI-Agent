@@ -1,40 +1,61 @@
-# Quick Start Guide - AI Database Assistant
+# Quick Start Guide - DataBuddy
 
-Get up and running in 5 minutes!
+Get up and running in 10 minutes with Supabase!
 
 ## TL;DR
 
 ```bash
-# 1. Backend Setup
+# 1. Set up Supabase
+# Go to https://supabase.com → Create project → Get DATABASE_URL
+
+# 2. Backend Setup
 cd backend
 python -m venv venv
 source venv/bin/activate  # Windows: venv\Scripts\activate
 pip install -r requirements.txt
-cp .env.example .env  # Then edit .env with your OpenAI API key
-mkdir databases
+# Create .env with DATABASE_URL and OPENAI_API_KEY
 uvicorn app.main:app --reload --port 8000
 
-# 2. Frontend Setup (new terminal)
+# 3. Frontend Setup (new terminal)
 cd frontend
 npm install
-cp .env.local.example .env.local
+# Create .env.local with NEXT_PUBLIC_API_URL=http://localhost:8000
 npm run dev
 
-# 3. Open browser
+# 4. Open browser
 # http://localhost:3000
 ```
 
 ## What You Need
 
-1. **OpenAI API Key** (Required)
+1. **Supabase Account** (Required - Free tier available)
+   - Get it: https://supabase.com
+   - Create a project and get your DATABASE_URL
+   - Free tier: 500MB database, 2GB bandwidth
+
+2. **OpenAI API Key** (Required)
    - Get it: https://platform.openai.com/api-keys
    - Cost: ~$0.01 per database creation
 
-2. **Plaid API** (Optional - for banking features)
+3. **Plaid API** (Optional - for banking features)
    - Get it: https://dashboard.plaid.com/signup
    - Free sandbox for testing
 
 ## Step-by-Step
+
+### 0. Setup Supabase (3 minutes)
+
+1. Go to https://supabase.com and sign up
+2. Click "New Project"
+3. Fill in:
+   - Name: `databuddy`
+   - Database Password: (create a strong password - save it!)
+   - Region: Choose closest to you
+4. Wait 2-3 minutes for setup
+5. Go to Project Settings → Database → Connection String
+6. Copy the URI connection string (replace `[YOUR-PASSWORD]` with your actual password)
+
+Note: You can name your project "databuddy" or any name you prefer.
 
 ### 1. Setup Backend (2 minutes)
 
@@ -47,6 +68,7 @@ pip install -r requirements.txt
 
 Create `backend/.env`:
 ```env
+DATABASE_URL=postgresql://postgres:[PASSWORD]@db.xxxxx.supabase.co:5432/postgres
 OPENAI_API_KEY=sk-your-key-here
 JWT_SECRET=random-secret-at-least-32-chars
 PLAID_CLIENT_ID=optional
@@ -56,9 +78,10 @@ PLAID_ENV=sandbox
 
 Start backend:
 ```bash
-mkdir databases
 uvicorn app.main:app --reload --port 8000
 ```
+
+Tables will be created automatically!
 
 ### 2. Setup Frontend (1 minute)
 
@@ -114,8 +137,9 @@ Once you have a database:
     ┌────┴─────┬──────────────┐
     ▼          ▼              ▼
 ┌────────┐  ┌──────┐    ┌──────────┐
-│SQLite  │  │OpenAI│    │  Plaid   │
-│Per-User│  │ GPT-4│    │(optional)│
+│Supabase│  │OpenAI│    │  Plaid   │
+│PostgreS│  │ GPT-4│    │(optional)│
+│QL      │  │      │    │          │
 └────────┘  └──────┘    └──────────┘
 ```
 
@@ -275,7 +299,7 @@ AI Agent/
 **Backend:**
 - FastAPI
 - OpenAI GPT-4
-- SQLite
+- Supabase PostgreSQL
 - Plaid
 - Pydantic
 - JWT

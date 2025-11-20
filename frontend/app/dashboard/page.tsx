@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { databaseAPI } from "@/lib/api";
 import { isAuthenticated } from "@/lib/auth";
-import { Plus, Database, Calendar, ChevronRight } from "lucide-react";
+import { Plus, Database, Calendar, ChevronRight, Trash2 } from "lucide-react";
 
 interface DatabaseInfo {
   id: string;
@@ -22,6 +22,7 @@ export default function DashboardPage() {
   const router = useRouter();
   const [databases, setDatabases] = useState<DatabaseInfo[]>([]);
   const [loading, setLoading] = useState(true);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!isAuthenticated()) {
@@ -49,6 +50,27 @@ export default function DashboardPage() {
       day: "numeric",
       year: "numeric",
     });
+  };
+
+  const handleDelete = async (dbId: string, dbName: string, e: React.MouseEvent) => {
+    e.preventDefault(); // Prevent navigation when clicking delete
+    e.stopPropagation();
+
+    if (!confirm(`Are you sure you want to delete "${dbName}"? This action cannot be undone.`)) {
+      return;
+    }
+
+    setDeletingId(dbId);
+
+    try {
+      await databaseAPI.delete(dbId);
+      await loadDatabases(); // Reload the list
+    } catch (error) {
+      console.error("Failed to delete database:", error);
+      alert("Failed to delete database. Please try again.");
+    } finally {
+      setDeletingId(null);
+    }
   };
 
   if (loading) {
@@ -130,14 +152,24 @@ export default function DashboardPage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1 + 0.2 }}
               >
-                <Link href={`/database/${db.id}`}>
-                  <Card className="glass-card card-3d h-full group cursor-pointer">
+                <Card className="glass-card card-3d h-full group relative">
+                  <Link href={`/database/${db.id}`} className="block cursor-pointer">
                     <CardHeader>
                       <div className="flex items-start justify-between mb-2">
                         <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-soft group-hover:shadow-glow transition-shadow">
                           <Database className="w-6 h-6 text-white" />
                         </div>
-                        <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:translate-x-1 transition-transform" />
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={(e) => handleDelete(db.id, db.display_name, e)}
+                            disabled={deletingId === db.id}
+                            className="p-2 rounded-lg hover:bg-red-50 text-muted-foreground hover:text-red-600 transition-colors disabled:opacity-50 z-10"
+                            title="Delete database"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                          <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:translate-x-1 transition-transform" />
+                        </div>
                       </div>
 
                       <CardTitle className="group-hover:text-primary transition-colors">
@@ -153,8 +185,8 @@ export default function DashboardPage() {
                         Created {formatDate(db.created_at)}
                       </div>
                     </CardHeader>
-                  </Card>
-                </Link>
+                  </Link>
+                </Card>
               </motion.div>
             ))}
           </div>

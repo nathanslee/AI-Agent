@@ -6,16 +6,20 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { databaseAPI } from "@/lib/api";
-import { Sparkles, Check, ArrowLeft } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { databaseAPI, aiAPI } from "@/lib/api";
+import { Sparkles, Check, ArrowLeft, Plus, X, Edit2 } from "lucide-react";
 
 export default function CreateDatabaseWizard() {
   const router = useRouter();
   const [step, setStep] = useState(1);
   const [description, setDescription] = useState("");
   const [generatedSchema, setGeneratedSchema] = useState<any>(null);
+  const [editedSchema, setEditedSchema] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [showAddField, setShowAddField] = useState(false);
+  const [newField, setNewField] = useState({ name: "", type: "TEXT", optional: false });
 
   const handleGenerateSchema = async () => {
     if (!description.trim()) {
@@ -27,8 +31,16 @@ export default function CreateDatabaseWizard() {
     setError("");
 
     try {
-      const response = await databaseAPI.create(description);
-      setGeneratedSchema(response.data.schema);
+      const response = await aiAPI.generateSchema(description);
+      const schema = response.data.schema;
+      setGeneratedSchema(schema);
+
+      // Initialize edited schema with all fields enabled
+      setEditedSchema({
+        ...schema,
+        fields: schema.fields.map((field: any) => ({ ...field, enabled: true }))
+      });
+
       setStep(2);
     } catch (err: any) {
       setError(err.response?.data?.detail || "Failed to generate schema");
@@ -37,8 +49,59 @@ export default function CreateDatabaseWizard() {
     }
   };
 
-  const handleConfirm = () => {
-    router.push("/dashboard");
+  const toggleField = (index: number) => {
+    const newFields = [...editedSchema.fields];
+    newFields[index].enabled = !newFields[index].enabled;
+    setEditedSchema({ ...editedSchema, fields: newFields });
+  };
+
+  const removeField = (index: number) => {
+    const newFields = editedSchema.fields.filter((_: any, i: number) => i !== index);
+    setEditedSchema({ ...editedSchema, fields: newFields });
+  };
+
+  const addNewField = () => {
+    if (!newField.name.trim()) {
+      setError("Field name is required");
+      return;
+    }
+
+    const newFields = [...editedSchema.fields, { ...newField, enabled: true }];
+    setEditedSchema({ ...editedSchema, fields: newFields });
+    setNewField({ name: "", type: "TEXT", optional: false });
+    setShowAddField(false);
+    setError("");
+  };
+
+  const updateFieldName = (index: number, name: string) => {
+    const newFields = [...editedSchema.fields];
+    newFields[index].name = name;
+    setEditedSchema({ ...editedSchema, fields: newFields });
+  };
+
+  const updateFieldType = (index: number, type: string) => {
+    const newFields = [...editedSchema.fields];
+    newFields[index].type = type;
+    setEditedSchema({ ...editedSchema, fields: newFields });
+  };
+
+  const toggleFieldOptional = (index: number) => {
+    const newFields = [...editedSchema.fields];
+    newFields[index].optional = !newFields[index].optional;
+    setEditedSchema({ ...editedSchema, fields: newFields });
+  };
+
+  const handleConfirm = async () => {
+    setLoading(true);
+    setError("");
+
+    try {
+      await databaseAPI.createWithSchema(editedSchema);
+      router.push("/dashboard");
+    } catch (err: any) {
+      setError(err.response?.data?.detail || "Failed to create database");
+      setLoading(false);
+    }
   };
 
   return (
@@ -173,8 +236,8 @@ export default function CreateDatabaseWizard() {
             </motion.div>
           )}
 
-          {/* Step 2: Review Schema */}
-          {step === 2 && generatedSchema && (
+          {/* Step 2: Review & Edit Schema */}
+          {step === 2 && editedSchema && (
             <motion.div
               key="step2"
               initial={{ opacity: 0, x: 50 }}
@@ -184,45 +247,163 @@ export default function CreateDatabaseWizard() {
               <Card className="glass-card">
                 <CardHeader>
                   <CardTitle className="text-3xl">
-                    Review Your Database
+                    Customize Your Database
                   </CardTitle>
                   <CardDescription className="text-base">
-                    Your AI-generated database schema is ready!
+                    Review AI suggestions and customize fields as needed
                   </CardDescription>
                 </CardHeader>
 
                 <CardContent className="space-y-6">
                   <div className="p-6 rounded-2xl bg-gradient-purple border border-purple-200">
                     <h3 className="font-display text-2xl font-semibold mb-1">
-                      {generatedSchema.display_name}
+                      {editedSchema.display_name}
                     </h3>
                     <p className="text-sm text-muted-foreground">
-                      Table: {generatedSchema.database_name}
+                      Table: {editedSchema.database_name}
                     </p>
                   </div>
 
                   <div className="space-y-3">
-                    <h4 className="font-semibold text-lg">Fields</h4>
+                    <div className="flex items-center justify-between">
+                      <h4 className="font-semibold text-lg">Fields</h4>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setShowAddField(true)}
+                      >
+                        <Plus className="w-4 h-4 mr-2" />
+                        Add Field
+                      </Button>
+                    </div>
+
+                    {/* Add New Field Form */}
+                    {showAddField && (
+                      <div className="p-4 rounded-2xl bg-blue-50 border border-blue-200 space-y-3">
+                        <div className="flex items-center justify-between">
+                          <h5 className="font-medium text-sm">Add New Field</h5>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => {
+                              setShowAddField(false);
+                              setNewField({ name: "", type: "TEXT", optional: false });
+                              setError("");
+                            }}
+                          >
+                            <X className="w-4 h-4" />
+                          </Button>
+                        </div>
+                        <div className="grid grid-cols-3 gap-3">
+                          <Input
+                            placeholder="Field name"
+                            value={newField.name}
+                            onChange={(e) => setNewField({ ...newField, name: e.target.value })}
+                          />
+                          <select
+                            className="flex h-10 w-full rounded-md border border-input bg-white px-3 py-2 text-sm"
+                            value={newField.type}
+                            onChange={(e) => setNewField({ ...newField, type: e.target.value })}
+                          >
+                            <option value="TEXT">Text</option>
+                            <option value="INTEGER">Number (Whole)</option>
+                            <option value="REAL">Number (Decimal)</option>
+                            <option value="DATE">Date</option>
+                          </select>
+                          <label className="flex items-center gap-2 text-sm">
+                            <input
+                              type="checkbox"
+                              checked={newField.optional}
+                              onChange={(e) => setNewField({ ...newField, optional: e.target.checked })}
+                            />
+                            Optional
+                          </label>
+                        </div>
+                        <Button size="sm" onClick={addNewField} className="w-full">
+                          Add Field
+                        </Button>
+                      </div>
+                    )}
+
                     <div className="grid gap-3">
-                      {generatedSchema.fields?.map((field: any, index: number) => (
+                      {editedSchema.fields?.map((field: any, index: number) => (
                         <div
                           key={index}
-                          className="p-4 rounded-2xl bg-white border border-gray-200 flex items-center justify-between"
+                          className={`p-4 rounded-2xl border transition-all ${
+                            field.enabled
+                              ? "bg-white border-gray-200"
+                              : "bg-gray-50 border-gray-300 opacity-60"
+                          }`}
                         >
-                          <div>
-                            <p className="font-medium">{field.name}</p>
-                            <p className="text-sm text-muted-foreground">
-                              Type: {field.type}
-                              {field.optional && " • Optional"}
-                            </p>
-                          </div>
-                          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
-                            <Check className="w-5 h-5 text-white" />
+                          <div className="flex items-start gap-3">
+                            {/* Checkbox to enable/disable */}
+                            <input
+                              type="checkbox"
+                              checked={field.enabled}
+                              onChange={() => toggleField(index)}
+                              className="mt-1.5 w-4 h-4 cursor-pointer"
+                            />
+
+                            <div className="flex-1 space-y-2">
+                              {/* Field Name */}
+                              <Input
+                                value={field.name}
+                                onChange={(e) => updateFieldName(index, e.target.value)}
+                                disabled={!field.enabled}
+                                className="font-medium"
+                              />
+
+                              {/* Field Type and Optional */}
+                              <div className="flex gap-3 items-center">
+                                <select
+                                  className="flex h-9 w-40 rounded-md border border-input bg-white px-3 py-1 text-sm disabled:opacity-50"
+                                  value={field.type}
+                                  onChange={(e) => updateFieldType(index, e.target.value)}
+                                  disabled={!field.enabled}
+                                >
+                                  <option value="TEXT">Text</option>
+                                  <option value="INTEGER">Number (Whole)</option>
+                                  <option value="REAL">Number (Decimal)</option>
+                                  <option value="DATE">Date</option>
+                                </select>
+                                <label className="flex items-center gap-2 text-sm">
+                                  <input
+                                    type="checkbox"
+                                    checked={field.optional}
+                                    onChange={() => toggleFieldOptional(index)}
+                                    disabled={!field.enabled}
+                                  />
+                                  Optional
+                                </label>
+                              </div>
+                            </div>
+
+                            {/* Remove button */}
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => removeField(index)}
+                              className="mt-1"
+                            >
+                              <X className="w-4 h-4 text-red-500" />
+                            </Button>
                           </div>
                         </div>
                       ))}
                     </div>
+
+                    {editedSchema.fields?.filter((f: any) => f.enabled).length === 0 && (
+                      <div className="p-4 rounded-2xl bg-yellow-50 border border-yellow-200 text-yellow-800 text-sm">
+                        ⚠️ You must enable at least one field to create the database
+                      </div>
+                    )}
                   </div>
+
+                  {error && (
+                    <div className="p-3 rounded-2xl bg-red-50 border border-red-200 text-red-600 text-sm">
+                      {error}
+                    </div>
+                  )}
 
                   <div className="flex gap-4">
                     <Button
@@ -235,10 +416,11 @@ export default function CreateDatabaseWizard() {
                     <Button
                       size="lg"
                       onClick={handleConfirm}
+                      disabled={editedSchema.fields?.filter((f: any) => f.enabled).length === 0 || loading}
                       className="flex-1 group"
                     >
-                      Create Database
-                      <Check className="ml-2 w-4 h-4" />
+                      {loading ? "Creating..." : "Create Database"}
+                      {!loading && <Check className="ml-2 w-4 h-4" />}
                     </Button>
                   </div>
                 </CardContent>
