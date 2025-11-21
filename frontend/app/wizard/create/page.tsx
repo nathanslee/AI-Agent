@@ -145,13 +145,13 @@ export default function CreateDatabaseWizard() {
                     ? "bg-gradient-to-br from-purple-500 to-pink-500 text-white shadow-glow"
                     : s < step
                     ? "bg-green-500 text-white"
-                    : "bg-gray-200 text-gray-400"
+                    : "bg-gray-200 dark:bg-gray-700 text-gray-400"
                 }`}
               >
                 {s < step ? <Check className="w-5 h-5" /> : s}
               </div>
               {s < 2 && (
-                <div className={`w-16 h-1 ${s < step ? "bg-green-500" : "bg-gray-200"}`} />
+                <div className={`w-16 h-1 ${s < step ? "bg-green-500" : "bg-gray-200 dark:bg-gray-700"}`} />
               )}
             </div>
           ))}
@@ -183,7 +183,7 @@ export default function CreateDatabaseWizard() {
                     </Label>
                     <textarea
                       id="description"
-                      className="flex min-h-[200px] w-full rounded-2xl border border-input bg-white/50 backdrop-blur-sm px-4 py-3 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 resize-none"
+                      className="flex min-h-[200px] w-full rounded-2xl border border-input bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm px-4 py-3 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 resize-none"
                       placeholder="Example: I want to track grocery items with the item name, date bought, store, food type, and expiration date."
                       value={description}
                       onChange={(e) => setDescription(e.target.value)}
@@ -201,7 +201,7 @@ export default function CreateDatabaseWizard() {
                         <button
                           key={index}
                           onClick={() => setDescription(prompt)}
-                          className="text-left p-3 rounded-2xl bg-white/50 hover:bg-white border border-gray-200 text-sm transition-all hover:shadow-soft"
+                          className="text-left p-3 rounded-2xl bg-white/50 dark:bg-gray-800/50 hover:bg-white dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700 text-sm transition-all hover:shadow-soft"
                           disabled={loading}
                         >
                           {prompt}
@@ -211,7 +211,7 @@ export default function CreateDatabaseWizard() {
                   </div>
 
                   {error && (
-                    <div className="p-3 rounded-2xl bg-red-50 border border-red-200 text-red-600 text-sm">
+                    <div className="p-3 rounded-2xl bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-300 text-sm">
                       {error}
                     </div>
                   )}
@@ -255,7 +255,7 @@ export default function CreateDatabaseWizard() {
                 </CardHeader>
 
                 <CardContent className="space-y-6">
-                  <div className="p-6 rounded-2xl bg-gradient-purple border border-purple-200">
+                  <div className="p-6 rounded-2xl bg-gradient-purple dark:bg-purple-900/30 border border-purple-200 dark:border-purple-800">
                     <h3 className="font-display text-2xl font-semibold mb-1">
                       {editedSchema.display_name}
                     </h3>
@@ -279,7 +279,7 @@ export default function CreateDatabaseWizard() {
 
                     {/* Add New Field Form */}
                     {showAddField && (
-                      <div className="p-4 rounded-2xl bg-blue-50 border border-blue-200 space-y-3">
+                      <div className="p-4 rounded-2xl bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 space-y-3">
                         <div className="flex items-center justify-between">
                           <h5 className="font-medium text-sm">Add New Field</h5>
                           <Button
@@ -301,7 +301,7 @@ export default function CreateDatabaseWizard() {
                             onChange={(e) => setNewField({ ...newField, name: e.target.value })}
                           />
                           <select
-                            className="flex h-10 w-full rounded-md border border-input bg-white px-3 py-2 text-sm"
+                            className="flex h-10 w-full rounded-md border border-input bg-white dark:bg-gray-800 px-3 py-2 text-sm"
                             value={newField.type}
                             onChange={(e) => setNewField({ ...newField, type: e.target.value })}
                           >
@@ -331,8 +331,8 @@ export default function CreateDatabaseWizard() {
                           key={index}
                           className={`p-4 rounded-2xl border transition-all ${
                             field.enabled
-                              ? "bg-white border-gray-200"
-                              : "bg-gray-50 border-gray-300 opacity-60"
+                              ? "bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700"
+                              : "bg-gray-50 dark:bg-gray-900 border-gray-300 dark:border-gray-700 opacity-60"
                           }`}
                         >
                           <div className="flex items-start gap-3">
@@ -356,7 +356,7 @@ export default function CreateDatabaseWizard() {
                               {/* Field Type and Optional */}
                               <div className="flex gap-3 items-center">
                                 <select
-                                  className="flex h-9 w-40 rounded-md border border-input bg-white px-3 py-1 text-sm disabled:opacity-50"
+                                  className="flex h-9 w-40 rounded-md border border-input bg-white dark:bg-gray-800 px-3 py-1 text-sm disabled:opacity-50"
                                   value={field.type}
                                   onChange={(e) => updateFieldType(index, e.target.value)}
                                   disabled={!field.enabled}
@@ -393,14 +393,14 @@ export default function CreateDatabaseWizard() {
                     </div>
 
                     {editedSchema.fields?.filter((f: any) => f.enabled).length === 0 && (
-                      <div className="p-4 rounded-2xl bg-yellow-50 border border-yellow-200 text-yellow-800 text-sm">
+                      <div className="p-4 rounded-2xl bg-yellow-50 dark:bg-yellow-900/30 border border-yellow-200 dark:border-yellow-800 text-yellow-800 dark:text-yellow-200 text-sm">
                         ⚠️ You must enable at least one field to create the database
                       </div>
                     )}
                   </div>
 
                   {error && (
-                    <div className="p-3 rounded-2xl bg-red-50 border border-red-200 text-red-600 text-sm">
+                    <div className="p-3 rounded-2xl bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-300 text-sm">
                       {error}
                     </div>
                   )}
