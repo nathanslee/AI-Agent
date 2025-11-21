@@ -52,28 +52,28 @@ export default function Navigation() {
           </Link>
 
           {/* Navigation Links */}
-          <div className="flex items-center gap-1 sm:gap-4 flex-shrink-0">
-            <div className="scale-75 sm:scale-100 origin-right">
+          <div className="flex items-center gap-2 sm:gap-4 flex-shrink-0">
+            <div className="scale-[0.65] sm:scale-100 origin-right -mr-2 sm:mr-0">
               <ThemeSwitch />
             </div>
             {isAuth ? (
               <>
                 <Link href="/dashboard">
-                  <Button variant={pathname === "/dashboard" ? "default" : "ghost"} className="text-[9px] sm:text-sm px-1.5 sm:px-6 h-6 sm:h-12 rounded-md sm:rounded-2xl">
-                    Dash
+                  <Button variant={pathname === "/dashboard" ? "default" : "ghost"} className="text-xs sm:text-sm px-2 sm:px-6 h-8 sm:h-12 rounded-lg sm:rounded-2xl">
+                    Dashboard
                   </Button>
                 </Link>
-                <Button variant="outline" onClick={handleLogout} className="text-[9px] sm:text-sm px-1.5 sm:px-6 h-6 sm:h-12 rounded-md sm:rounded-2xl">
-                  Out
+                <Button variant="outline" onClick={handleLogout} className="text-xs sm:text-sm px-2 sm:px-6 h-8 sm:h-12 rounded-lg sm:rounded-2xl">
+                  Logout
                 </Button>
               </>
             ) : (
               <>
                 <Link href="/login">
-                  <Button variant="ghost" className="font-display text-[9px] sm:text-sm px-1.5 sm:px-6 h-6 sm:h-12 rounded-md sm:rounded-2xl">Login</Button>
+                  <Button variant="ghost" className="font-display text-xs sm:text-sm px-2 sm:px-6 h-8 sm:h-12 rounded-lg sm:rounded-2xl">Login</Button>
                 </Link>
                 <Link href="/signup">
-                  <Button className="font-display text-[9px] sm:text-sm px-1.5 sm:px-6 h-6 sm:h-12 rounded-md sm:rounded-2xl">Sign Up</Button>
+                  <Button className="font-display text-xs sm:text-sm px-2 sm:px-6 h-8 sm:h-12 rounded-lg sm:rounded-2xl">Sign Up</Button>
                 </Link>
               </>
             )}
