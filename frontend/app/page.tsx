@@ -186,8 +186,8 @@ const features = [
   },
   {
     icon: Database,
-    title: "Calendar Reminders",
-    description: "Connect Google Calendar and get automatic reminders for expiration dates and important events.",
+    title: "Data Export",
+    description: "Export your data to CSV, JSON, or PDF formats. Share and backup your databases easily.",
   },
   {
     icon: Sparkles,

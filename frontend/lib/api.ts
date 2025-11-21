@@ -127,35 +127,4 @@ function downloadBlob(blob: Blob, filename: string) {
   document.body.removeChild(a);
 }
 
-export const googleCalendarAPI = {
-  getAuthUrl: () =>
-    api.get('/api/google/auth-url'),
-
-  handleCallback: (code: string, state: string) =>
-    api.post('/api/google/callback', { code, state }),
-
-  getStatus: () =>
-    api.get('/api/google/status'),
-
-  createEvent: (title: string, startDate: string, endDate?: string, description?: string, allDay?: boolean, reminderMinutes?: number) =>
-    api.post('/api/google/create-event', {
-      title,
-      start_date: startDate,
-      end_date: endDate,
-      description,
-      all_day: allDay ?? true,
-      reminder_minutes: reminderMinutes ?? 1440
-    }),
-
-  createExpirationReminder: (itemName: string, expirationDate: string, daysBefore?: number) =>
-    api.post('/api/google/create-expiration-reminder', {
-      item_name: itemName,
-      expiration_date: expirationDate,
-      days_before: daysBefore ?? 1
-    }),
-
-  getUpcomingEvents: () =>
-    api.get('/api/google/upcoming-events'),
-};
-
 export default api;

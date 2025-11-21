@@ -17,15 +17,13 @@ from .models import (
     ExecuteSQLRequest, NaturalLanguageRequest, InsertDataRequest,
     SuggestExpirationRequest, CategorizeItemRequest,
     ExchangeTokenRequest, SyncTransactionsRequest,
-    GenerateSchemaRequest, CreateDatabaseWithSchemaRequest,
-    GoogleAuthCallbackRequest, CreateCalendarEventRequest, CreateExpirationReminderRequest
+    GenerateSchemaRequest, CreateDatabaseWithSchemaRequest
 )
 from .auth import hash_password, verify_password, create_access_token, get_current_user_id
 from .database import db_manager
 from .ai_agent import ai_agent
 from .sql_validator import sql_validator
 from .plaid_integration import plaid_integration
-from .google_calendar import google_calendar
 
 app = FastAPI(
     title="DataBuddy API",
@@ -616,116 +614,6 @@ async def sync_plaid_transactions(
             "inserted": inserted_count
         }
 
-    except Exception as e:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
-
-
-# ============================================================================
-# GOOGLE CALENDAR INTEGRATION ENDPOINTS
-# ============================================================================
-
-@app.get("/api/google/auth-url")
-async def get_google_auth_url(user_id: str = Depends(get_current_user_id)):
-    """Get Google OAuth authorization URL"""
-    try:
-        auth_url = google_calendar.get_authorization_url(state=user_id)
-        return {"auth_url": auth_url}
-    except ValueError as e:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
-
-
-@app.post("/api/google/callback")
-async def google_auth_callback(
-    request: GoogleAuthCallbackRequest,
-    user_id: str = Depends(get_current_user_id)
-):
-    """Handle Google OAuth callback"""
-    try:
-        token_data = google_calendar.exchange_code(request.code)
-
-        # Save the token
-        db_manager.save_google_token(user_id, token_data)
-
-        return {"message": "Google Calendar connected successfully"}
-    except Exception as e:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
-
-
-@app.get("/api/google/status")
-async def get_google_connection_status(user_id: str = Depends(get_current_user_id)):
-    """Check if Google Calendar is connected"""
-    token = db_manager.get_google_token(user_id)
-    return {"connected": token is not None}
-
-
-@app.post("/api/google/create-event")
-async def create_calendar_event(
-    request: CreateCalendarEventRequest,
-    user_id: str = Depends(get_current_user_id)
-):
-    """Create a Google Calendar event"""
-    try:
-        token_data = db_manager.get_google_token(user_id)
-        if not token_data:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Google Calendar not connected. Please connect first."
-            )
-
-        event = google_calendar.create_event(
-            token_data=token_data,
-            title=request.title,
-            description=request.description,
-            start_date=request.start_date,
-            end_date=request.end_date,
-            all_day=request.all_day,
-            reminder_minutes=request.reminder_minutes
-        )
-
-        return {"message": "Event created successfully", "event": event}
-    except Exception as e:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
-
-
-@app.post("/api/google/create-expiration-reminder")
-async def create_expiration_reminder(
-    request: CreateExpirationReminderRequest,
-    user_id: str = Depends(get_current_user_id)
-):
-    """Create a reminder for item expiration"""
-    try:
-        token_data = db_manager.get_google_token(user_id)
-        if not token_data:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Google Calendar not connected. Please connect first."
-            )
-
-        event = google_calendar.create_expiration_reminder(
-            token_data=token_data,
-            item_name=request.item_name,
-            expiration_date=request.expiration_date,
-            days_before=request.days_before
-        )
-
-        return {"message": "Reminder created successfully", "event": event}
-    except Exception as e:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
-
-
-@app.get("/api/google/upcoming-events")
-async def get_upcoming_events(user_id: str = Depends(get_current_user_id)):
-    """Get upcoming calendar events"""
-    try:
-        token_data = db_manager.get_google_token(user_id)
-        if not token_data:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Google Calendar not connected. Please connect first."
-            )
-
-        events = google_calendar.list_upcoming_events(token_data)
-        return {"events": events}
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
