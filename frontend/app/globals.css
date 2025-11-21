@@ -74,7 +74,7 @@
 
 @layer utilities {
   .glass {
-    @apply bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl border border-white/20 dark:border-gray-700/30;
+    @apply bg-white/70 dark:bg-gray-900/90 backdrop-blur-xl border border-white/20 dark:border-gray-700/50;
   }
 
   .glass-card {
