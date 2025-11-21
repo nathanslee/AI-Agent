@@ -59,21 +59,25 @@ export default function Navigation() {
             {isAuth ? (
               <>
                 <Link href="/dashboard">
-                  <Button variant={pathname === "/dashboard" ? "default" : "ghost"} className="text-xs sm:text-sm px-2 sm:px-6 h-8 sm:h-12 rounded-lg sm:rounded-2xl">
+                  <Button variant={pathname === "/dashboard" ? "default" : "ghost"} className="text-xs sm:text-sm px-3 sm:px-6 h-8 sm:h-12 rounded-lg sm:rounded-2xl">
                     Dashboard
                   </Button>
                 </Link>
-                <Button variant="outline" onClick={handleLogout} className="text-xs sm:text-sm px-2 sm:px-6 h-8 sm:h-12 rounded-lg sm:rounded-2xl">
+                <Button variant="outline" onClick={handleLogout} className="text-xs sm:text-sm px-3 sm:px-6 h-8 sm:h-12 rounded-lg sm:rounded-2xl">
                   Logout
                 </Button>
               </>
             ) : (
               <>
                 <Link href="/login">
-                  <Button variant="ghost" className="text-xs sm:text-sm px-2 sm:px-6 h-8 sm:h-12 rounded-lg sm:rounded-2xl">Login</Button>
+                  <Button variant="ghost" className="text-xs sm:text-sm px-3 sm:px-6 h-8 sm:h-12 rounded-lg sm:rounded-2xl">
+                    Login
+                  </Button>
                 </Link>
                 <Link href="/signup">
-                  <Button className="text-xs sm:text-sm px-2 sm:px-6 h-8 sm:h-12 rounded-lg sm:rounded-2xl">Sign Up</Button>
+                  <Button className="text-xs sm:text-sm px-3 sm:px-6 h-8 sm:h-12 rounded-lg sm:rounded-2xl">
+                    Sign Up
+                  </Button>
                 </Link>
               </>
             )}
