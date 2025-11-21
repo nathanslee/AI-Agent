@@ -25,10 +25,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body className={`${dmSans.variable} ${inter.variable}`}>
+    <html lang="en" className="overflow-x-hidden">
+      <body className={`${dmSans.variable} ${inter.variable} overflow-x-hidden`}>
         <Navigation />
-        <main className="min-h-screen">
+        <main className="min-h-screen overflow-x-hidden">
           {children}
         </main>
       </body>

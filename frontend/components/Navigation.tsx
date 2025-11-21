@@ -52,26 +52,28 @@ export default function Navigation() {
           </Link>
 
           {/* Navigation Links */}
-          <div className="flex items-center gap-1.5 sm:gap-4">
-            <ThemeSwitch />
+          <div className="flex items-center gap-1 sm:gap-4 flex-shrink-0">
+            <div className="scale-75 sm:scale-100 origin-right">
+              <ThemeSwitch />
+            </div>
             {isAuth ? (
               <>
                 <Link href="/dashboard">
-                  <Button variant={pathname === "/dashboard" ? "default" : "ghost"} className="text-[10px] sm:text-sm px-2 sm:px-6 h-7 sm:h-12 rounded-lg sm:rounded-2xl">
-                    Dashboard
+                  <Button variant={pathname === "/dashboard" ? "default" : "ghost"} className="text-[9px] sm:text-sm px-1.5 sm:px-6 h-6 sm:h-12 rounded-md sm:rounded-2xl">
+                    Dash
                   </Button>
                 </Link>
-                <Button variant="outline" onClick={handleLogout} className="text-[10px] sm:text-sm px-2 sm:px-6 h-7 sm:h-12 rounded-lg sm:rounded-2xl">
-                  Logout
+                <Button variant="outline" onClick={handleLogout} className="text-[9px] sm:text-sm px-1.5 sm:px-6 h-6 sm:h-12 rounded-md sm:rounded-2xl">
+                  Out
                 </Button>
               </>
             ) : (
               <>
                 <Link href="/login">
-                  <Button variant="ghost" className="font-display text-[10px] sm:text-sm px-2 sm:px-6 h-7 sm:h-12 rounded-lg sm:rounded-2xl">Login</Button>
+                  <Button variant="ghost" className="font-display text-[9px] sm:text-sm px-1.5 sm:px-6 h-6 sm:h-12 rounded-md sm:rounded-2xl">Login</Button>
                 </Link>
                 <Link href="/signup">
-                  <Button className="font-display text-[10px] sm:text-sm px-2 sm:px-6 h-7 sm:h-12 rounded-lg sm:rounded-2xl">Sign Up</Button>
+                  <Button className="font-display text-[9px] sm:text-sm px-1.5 sm:px-6 h-6 sm:h-12 rounded-md sm:rounded-2xl">Sign Up</Button>
                 </Link>
               </>
             )}
