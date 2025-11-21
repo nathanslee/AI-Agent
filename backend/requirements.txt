@@ -7,6 +7,6 @@ pydantic==2.10.3
 pydantic-settings==2.1.0
 email-validator==2.1.0
 python-dotenv==1.0.0
-openai==1.10.0
+openai>=1.40.0
 plaid-python==18.0.0
 psycopg2-binary==2.9.9
