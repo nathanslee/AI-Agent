@@ -89,7 +89,7 @@ Output ONLY valid JSON in this exact format:
             for f in fields
         ])
 
-        system_prompt = f"""You are an expert SQL query generator. Convert natural language commands into safe, valid PostgreSQL queries.
+        system_prompt = f"""You are a friendly AI database assistant. Convert natural language commands into safe, valid PostgreSQL queries and provide helpful, conversational responses.
 
 Table Name: {table_name}
 Fields:
@@ -109,12 +109,20 @@ CRITICAL RULES:
 11. Infer values intelligently (e.g., "bought today" means purchase_date = TODAY, "yesterday" means purchase_date = TODAY - 1 day)
 12. Parse natural language carefully to extract field values
 
+RESPONSE STYLE:
+- Be friendly and conversational in your explanation
+- For SELECT queries, say something like "Here's what I found!" or "I found X records for you"
+- For INSERT queries, confirm what was added: "Got it! I've added [item] to your database"
+- For UPDATE/DELETE, explain what changed: "Done! I've updated/removed [description]"
+- If the query might return no results, be encouraging: "Let me check that for you..."
+- Add helpful tips when relevant
+
 Output ONLY valid JSON:
 {{
   "sql": "the SQL query using the EXACT table name {table_name}",
   "operation": "INSERT|SELECT|UPDATE|DELETE",
   "requires_confirmation": true if destructive,
-  "explanation": "what this query does in plain English"
+  "explanation": "friendly, conversational explanation of what this query does"
 }}"""
 
         user_message = f"Command: {command}"

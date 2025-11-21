@@ -23,7 +23,12 @@ export default function DatabasePage() {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [activeTab, setActiveTab] = useState<"table" | "form" | "command">("table");
-  const [chatMessages, setChatMessages] = useState<Array<{role: 'user' | 'assistant', content: string, sql?: string, data?: any[]}>>([]);
+  const [chatMessages, setChatMessages] = useState<Array<{role: 'user' | 'assistant', content: string, sql?: string, data?: any[]}>>([
+    {
+      role: 'assistant',
+      content: `Hi! I'm your AI database assistant. I can help you with:\n\n• **Query your data** - "Show me all records" or "Find items from last week"\n• **Add new entries** - "Add milk bought today for $5"\n• **Analyze data** - "How many records do I have?" or "Show me totals by category"\n• **Update records** - "Mark item #1 as completed"\n\nJust type your question in plain English and I'll help you out!`
+    }
+  ]);
 
   // Helper function to format field names
   const formatFieldName = (name: string) => {
@@ -428,14 +433,7 @@ export default function DatabasePage() {
               <CardContent className="space-y-4">
                 {/* Chat Messages */}
                 <div className="h-[400px] overflow-y-auto border rounded-2xl p-4 bg-gray-50/50 space-y-4">
-                  {chatMessages.length === 0 ? (
-                    <div className="h-full flex flex-col items-center justify-center text-center text-muted-foreground">
-                      <Sparkles className="w-12 h-12 mb-4 opacity-30" />
-                      <p className="text-lg font-medium mb-2">Start a conversation</p>
-                      <p className="text-sm">Ask me anything about your data!</p>
-                    </div>
-                  ) : (
-                    chatMessages.map((msg, index) => (
+                  {chatMessages.map((msg, index) => (
                       <div
                         key={index}
                         className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
@@ -447,7 +445,11 @@ export default function DatabasePage() {
                               : 'bg-white border border-gray-200 shadow-sm'
                           }`}
                         >
-                          <p className="text-sm">{msg.content}</p>
+                          <div className="text-sm whitespace-pre-wrap" dangerouslySetInnerHTML={{
+                              __html: msg.content
+                                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                                .replace(/\n/g, '<br/>')
+                            }} />
                           {msg.data && msg.data.length > 0 && (
                             <div className="mt-3 overflow-x-auto">
                               <table className="w-full text-xs border-collapse">
@@ -490,8 +492,7 @@ export default function DatabasePage() {
                           )}
                         </div>
                       </div>
-                    ))
-                  )}
+                    ))}
                   {submitting && (
                     <div className="flex justify-start">
                       <div className="bg-white border border-gray-200 shadow-sm p-3 rounded-2xl">
@@ -506,7 +507,7 @@ export default function DatabasePage() {
                 </div>
 
                 {/* Quick Actions */}
-                {chatMessages.length === 0 && (
+                {chatMessages.length <= 1 && (
                   <div className="flex flex-wrap gap-2">
                     {exampleCommands.map((cmd, index) => (
                       <button
