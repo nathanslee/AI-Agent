@@ -85,7 +85,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen px-6 pt-32 pb-16">
+    <div className="min-h-screen px-4 sm:px-6 pt-24 sm:pt-32 pb-12 sm:pb-16">
       {/* Background Effect */}
       <div className="absolute inset-0 -z-10">
         <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-purple-300 rounded-full mix-blend-multiply filter blur-3xl opacity-10 animate-float" />
@@ -97,10 +97,10 @@ export default function DashboardPage() {
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-12"
+          className="mb-8 sm:mb-12"
         >
-          <h1 className="font-display text-5xl font-bold mb-4">My Databases</h1>
-          <p className="text-xl text-muted-foreground">
+          <h1 className="font-display text-3xl sm:text-5xl font-bold mb-2 sm:mb-4">My Databases</h1>
+          <p className="text-base sm:text-xl text-muted-foreground">
             Manage and access all your AI-powered databases
           </p>
         </motion.div>
@@ -110,19 +110,19 @@ export default function DashboardPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="mb-8"
+          className="mb-6 sm:mb-8"
         >
           <Link href="/wizard/create">
             <Card className="glass-card card-3d border-2 border-dashed border-primary/30 hover:border-primary/60 cursor-pointer group">
-              <CardContent className="flex items-center justify-center py-16">
+              <CardContent className="flex items-center justify-center py-10 sm:py-16">
                 <div className="text-center">
-                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center mx-auto mb-4 shadow-glow group-hover:scale-110 transition-transform">
-                    <Plus className="w-8 h-8 text-white" />
+                  <div className="w-12 sm:w-16 h-12 sm:h-16 rounded-xl sm:rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center mx-auto mb-3 sm:mb-4 shadow-glow group-hover:scale-110 transition-transform">
+                    <Plus className="w-6 sm:w-8 h-6 sm:h-8 text-white" />
                   </div>
-                  <h3 className="font-display text-2xl font-semibold mb-2">
+                  <h3 className="font-display text-xl sm:text-2xl font-semibold mb-1 sm:mb-2">
                     Create New Database
                   </h3>
-                  <p className="text-muted-foreground">
+                  <p className="text-sm sm:text-base text-muted-foreground">
                     Use natural language to build your custom database
                   </p>
                 </div>
@@ -144,7 +144,7 @@ export default function DashboardPage() {
             </p>
           </motion.div>
         ) : (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {databases.map((db, index) => (
               <motion.div
                 key={db.id}
@@ -154,10 +154,10 @@ export default function DashboardPage() {
               >
                 <Card className="glass-card card-3d h-full group relative">
                   <Link href={`/database/${db.id}`} className="block cursor-pointer">
-                    <CardHeader>
+                    <CardHeader className="p-4 sm:p-6">
                       <div className="flex items-start justify-between mb-2">
-                        <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-soft group-hover:shadow-glow transition-shadow">
-                          <Database className="w-6 h-6 text-white" />
+                        <div className="w-10 sm:w-12 h-10 sm:h-12 rounded-xl sm:rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-soft group-hover:shadow-glow transition-shadow">
+                          <Database className="w-5 sm:w-6 h-5 sm:h-6 text-white" />
                         </div>
                         <div className="flex items-center gap-2">
                           <button
@@ -172,16 +172,16 @@ export default function DashboardPage() {
                         </div>
                       </div>
 
-                      <CardTitle className="group-hover:text-primary transition-colors">
+                      <CardTitle className="group-hover:text-primary transition-colors text-base sm:text-lg">
                         {db.display_name}
                       </CardTitle>
 
-                      <CardDescription className="text-sm">
+                      <CardDescription className="text-xs sm:text-sm">
                         {db.schema.fields?.length || 0} fields
                       </CardDescription>
 
-                      <div className="flex items-center gap-2 text-xs text-muted-foreground pt-4">
-                        <Calendar className="w-4 h-4" />
+                      <div className="flex items-center gap-2 text-xs text-muted-foreground pt-3 sm:pt-4">
+                        <Calendar className="w-3 sm:w-4 h-3 sm:h-4" />
                         Created {formatDate(db.created_at)}
                       </div>
                     </CardHeader>

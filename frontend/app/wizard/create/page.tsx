@@ -105,7 +105,7 @@ export default function CreateDatabaseWizard() {
   };
 
   return (
-    <div className="min-h-screen px-6 pt-32 pb-16">
+    <div className="min-h-screen px-4 sm:px-6 pt-24 sm:pt-32 pb-12 sm:pb-16">
       {/* Background Effect */}
       <div className="absolute inset-0 -z-10">
         <div className="absolute top-1/4 left-1/3 w-96 h-96 bg-purple-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-float" />
@@ -116,31 +116,31 @@ export default function CreateDatabaseWizard() {
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-12"
+          className="mb-8 sm:mb-12"
         >
           <Button
             variant="ghost"
             onClick={() => router.push("/dashboard")}
-            className="mb-6"
+            className="mb-4 sm:mb-6 text-sm"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Dashboard
           </Button>
 
-          <h1 className="font-display text-5xl font-bold mb-4">
+          <h1 className="font-display text-3xl sm:text-5xl font-bold mb-2 sm:mb-4">
             Create New Database
           </h1>
-          <p className="text-xl text-muted-foreground">
+          <p className="text-base sm:text-xl text-muted-foreground">
             Describe what you want to track
           </p>
         </motion.div>
 
         {/* Progress Steps */}
-        <div className="flex items-center justify-center gap-4 mb-12">
+        <div className="flex items-center justify-center gap-2 sm:gap-4 mb-8 sm:mb-12">
           {[1, 2].map((s) => (
             <div key={s} className="flex items-center">
               <div
-                className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold transition-all ${
+                className={`w-8 sm:w-10 h-8 sm:h-10 rounded-full flex items-center justify-center font-semibold text-sm sm:text-base transition-all ${
                   s === step
                     ? "bg-gradient-to-br from-purple-500 to-pink-500 text-white shadow-glow"
                     : s < step
@@ -151,7 +151,7 @@ export default function CreateDatabaseWizard() {
                 {s < step ? <Check className="w-5 h-5" /> : s}
               </div>
               {s < 2 && (
-                <div className={`w-16 h-1 ${s < step ? "bg-green-500" : "bg-gray-200 dark:bg-gray-700"}`} />
+                <div className={`w-8 sm:w-16 h-1 ${s < step ? "bg-green-500" : "bg-gray-200 dark:bg-gray-700"}`} />
               )}
             </div>
           ))}
@@ -167,23 +167,23 @@ export default function CreateDatabaseWizard() {
               exit={{ opacity: 0, x: -50 }}
             >
               <Card className="glass-card">
-                <CardHeader>
-                  <CardTitle className="text-3xl">
+                <CardHeader className="p-4 sm:p-6">
+                  <CardTitle className="text-xl sm:text-3xl">
                     What do you want to track?
                   </CardTitle>
-                  <CardDescription className="text-base">
+                  <CardDescription className="text-sm sm:text-base">
                     Describe your database in plain English. Our AI will create the perfect schema.
                   </CardDescription>
                 </CardHeader>
 
-                <CardContent className="space-y-6">
+                <CardContent className="p-4 sm:p-6 pt-0 space-y-4 sm:space-y-6">
                   <div className="space-y-2">
-                    <Label htmlFor="description" className="text-lg">
+                    <Label htmlFor="description" className="text-base sm:text-lg">
                       Description
                     </Label>
                     <textarea
                       id="description"
-                      className="flex min-h-[200px] w-full rounded-2xl border border-input bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm px-4 py-3 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 resize-none"
+                      className="flex min-h-[150px] sm:min-h-[200px] w-full rounded-xl sm:rounded-2xl border border-input bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm px-3 sm:px-4 py-2 sm:py-3 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 resize-none"
                       placeholder="Example: I want to track grocery items with the item name, date bought, store, food type, and expiration date."
                       value={description}
                       onChange={(e) => setDescription(e.target.value)}
@@ -201,7 +201,7 @@ export default function CreateDatabaseWizard() {
                         <button
                           key={index}
                           onClick={() => setDescription(prompt)}
-                          className="text-left p-3 rounded-2xl bg-white/50 dark:bg-gray-800/50 hover:bg-white dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700 text-sm transition-all hover:shadow-soft"
+                          className="text-left p-2 sm:p-3 rounded-xl sm:rounded-2xl bg-white/50 dark:bg-gray-800/50 hover:bg-white dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700 text-xs sm:text-sm transition-all hover:shadow-soft"
                           disabled={loading}
                         >
                           {prompt}
@@ -245,28 +245,28 @@ export default function CreateDatabaseWizard() {
               exit={{ opacity: 0, x: -50 }}
             >
               <Card className="glass-card">
-                <CardHeader>
-                  <CardTitle className="text-3xl">
+                <CardHeader className="p-4 sm:p-6">
+                  <CardTitle className="text-xl sm:text-3xl">
                     Customize Your Database
                   </CardTitle>
-                  <CardDescription className="text-base">
+                  <CardDescription className="text-sm sm:text-base">
                     Review AI suggestions and customize fields as needed
                   </CardDescription>
                 </CardHeader>
 
-                <CardContent className="space-y-6">
-                  <div className="p-6 rounded-2xl bg-gradient-purple dark:bg-purple-900/30 border border-purple-200 dark:border-purple-800">
-                    <h3 className="font-display text-2xl font-semibold mb-1 text-purple-900 dark:text-purple-100">
+                <CardContent className="p-4 sm:p-6 pt-0 space-y-4 sm:space-y-6">
+                  <div className="p-4 sm:p-6 rounded-xl sm:rounded-2xl bg-gradient-purple dark:bg-purple-900/30 border border-purple-200 dark:border-purple-800">
+                    <h3 className="font-display text-lg sm:text-2xl font-semibold mb-1 text-purple-900 dark:text-purple-100">
                       {editedSchema.display_name}
                     </h3>
-                    <p className="text-sm text-purple-700 dark:text-purple-300">
+                    <p className="text-xs sm:text-sm text-purple-700 dark:text-purple-300">
                       Table: {editedSchema.database_name}
                     </p>
                   </div>
 
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
-                      <h4 className="font-semibold text-lg">Fields</h4>
+                      <h4 className="font-semibold text-base sm:text-lg">Fields</h4>
                       <Button
                         variant="outline"
                         size="sm"
@@ -279,7 +279,7 @@ export default function CreateDatabaseWizard() {
 
                     {/* Add New Field Form */}
                     {showAddField && (
-                      <div className="p-4 rounded-2xl bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 space-y-3">
+                      <div className="p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 space-y-3">
                         <div className="flex items-center justify-between">
                           <h5 className="font-medium text-sm">Add New Field</h5>
                           <Button
@@ -294,7 +294,7 @@ export default function CreateDatabaseWizard() {
                             <X className="w-4 h-4" />
                           </Button>
                         </div>
-                        <div className="grid grid-cols-3 gap-3">
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3">
                           <Input
                             placeholder="Field name"
                             value={newField.name}
@@ -325,17 +325,17 @@ export default function CreateDatabaseWizard() {
                       </div>
                     )}
 
-                    <div className="grid gap-3">
+                    <div className="grid gap-2 sm:gap-3">
                       {editedSchema.fields?.map((field: any, index: number) => (
                         <div
                           key={index}
-                          className={`p-4 rounded-2xl border transition-all ${
+                          className={`p-3 sm:p-4 rounded-xl sm:rounded-2xl border transition-all ${
                             field.enabled
                               ? "bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700"
                               : "bg-gray-50 dark:bg-gray-900 border-gray-300 dark:border-gray-700 opacity-60"
                           }`}
                         >
-                          <div className="flex items-start gap-3">
+                          <div className="flex items-start gap-2 sm:gap-3">
                             {/* Checkbox to enable/disable */}
                             <input
                               type="checkbox"
@@ -354,9 +354,9 @@ export default function CreateDatabaseWizard() {
                               />
 
                               {/* Field Type and Optional */}
-                              <div className="flex gap-3 items-center">
+                              <div className="flex flex-wrap gap-2 sm:gap-3 items-center">
                                 <select
-                                  className="flex h-9 w-40 rounded-md border border-input bg-white dark:bg-gray-800 px-3 py-1 text-sm disabled:opacity-50"
+                                  className="flex h-9 w-full sm:w-40 rounded-md border border-input bg-white dark:bg-gray-800 px-3 py-1 text-sm disabled:opacity-50"
                                   value={field.type}
                                   onChange={(e) => updateFieldType(index, e.target.value)}
                                   disabled={!field.enabled}

@@ -60,15 +60,15 @@
   }
 
   h1 {
-    @apply text-5xl md:text-7xl;
+    @apply text-3xl sm:text-5xl md:text-7xl;
   }
 
   h2 {
-    @apply text-4xl md:text-5xl;
+    @apply text-2xl sm:text-4xl md:text-5xl;
   }
 
   h3 {
-    @apply text-3xl md:text-4xl;
+    @apply text-xl sm:text-3xl md:text-4xl;
   }
 }
 
@@ -112,9 +112,13 @@
   @apply bg-gray-400;
 }
 
-/* Smooth transitions for all interactive elements */
-button, a, input, textarea, select {
-  @apply transition-all duration-200;
+/* Smooth transitions for interactive elements - avoid color transitions for theme switch */
+input, textarea, select {
+  @apply transition-[border-color,box-shadow] duration-200;
+}
+
+a {
+  @apply transition-[opacity,transform] duration-200;
 }
 
 /* Focus visible states */

@@ -47,7 +47,7 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-6 pt-20">
+    <div className="min-h-screen flex items-center justify-center px-4 sm:px-6 pt-20">
       {/* Background Effect */}
       <div className="absolute inset-0 -z-10">
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-pink-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-float" />
@@ -60,15 +60,15 @@ export default function SignupPage() {
         className="w-full max-w-md"
       >
         <Card className="glass-card">
-          <CardHeader className="text-center">
-            <CardTitle className="text-3xl mb-2">Create Account</CardTitle>
-            <CardDescription className="text-base">
+          <CardHeader className="text-center p-4 sm:p-6">
+            <CardTitle className="text-2xl sm:text-3xl mb-2">Create Account</CardTitle>
+            <CardDescription className="text-sm sm:text-base">
               Start building your AI-powered databases
             </CardDescription>
           </CardHeader>
 
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-6">
+          <CardContent className="p-4 sm:p-6 pt-0">
+            <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
                 <Input

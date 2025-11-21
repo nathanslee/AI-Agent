@@ -27,25 +27,25 @@ export default function HomePage() {
           <div className="absolute bottom-1/4 left-1/3 w-96 h-96 bg-blue-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-float" style={{ animationDelay: "4s" }} />
         </div>
 
-        <div className="max-w-7xl mx-auto px-6 grid lg:grid-cols-2 gap-12 items-center">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 grid lg:grid-cols-2 gap-6 sm:gap-12 items-center">
           {/* Left Column - Text */}
           <motion.div
             initial={{ opacity: 0, x: -50 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8 }}
           >
-            <h1 className="font-display text-6xl md:text-7xl font-bold mb-6 leading-tight">
+            <h1 className="font-display text-4xl sm:text-5xl md:text-7xl font-bold mb-4 sm:mb-6 leading-tight">
               Build Databases
               <br />
               <span className="gradient-text">With Natural Language</span>
             </h1>
 
-            <p className="text-xl text-muted-foreground mb-8 max-w-xl text-balance">
+            <p className="text-base sm:text-xl text-muted-foreground mb-6 sm:mb-8 max-w-xl text-balance">
               AI-powered database creation and management. Just describe what you want to track,
               and watch your custom database come to life instantly.
             </p>
 
-            <div className="flex gap-4">
+            <div className="flex flex-wrap gap-3 sm:gap-4">
               <Link href={isAuth ? "/dashboard" : "/signup"}>
                 <button className="relative group overflow-hidden px-6 h-12 rounded-full flex space-x-2 items-center bg-gradient-to-r from-pink-500 to-purple-500 hover:to-purple-600">
                   <span className="relative text-sm text-white font-display">Get Started</span>
@@ -86,23 +86,23 @@ export default function HomePage() {
       </section>
 
       {/* Features Section */}
-      <section className="py-24 px-6">
+      <section className="py-12 sm:py-24 px-4 sm:px-6">
         <div className="max-w-7xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 50 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-center mb-16"
+            className="text-center mb-8 sm:mb-16"
           >
-            <h2 className="font-display text-4xl md:text-5xl font-bold mb-4">
+            <h2 className="font-display text-2xl sm:text-4xl md:text-5xl font-bold mb-3 sm:mb-4">
               Intelligent Database Management
             </h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-base sm:text-xl text-muted-foreground max-w-2xl mx-auto">
               Powered by AI to make database creation and management effortless
             </p>
           </motion.div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-8">
             {features.map((feature, index) => (
               <motion.div
                 key={index}
@@ -112,12 +112,12 @@ export default function HomePage() {
                 transition={{ delay: index * 0.1 }}
               >
                 <Card className="glass-card card-3d h-full">
-                  <CardHeader>
-                    <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center mb-4 shadow-glow">
-                      <feature.icon className="w-7 h-7 text-white" />
+                  <CardHeader className="p-4 sm:p-6">
+                    <div className="w-10 sm:w-14 h-10 sm:h-14 rounded-xl sm:rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center mb-3 sm:mb-4 shadow-glow">
+                      <feature.icon className="w-5 sm:w-7 h-5 sm:h-7 text-white" />
                     </div>
-                    <CardTitle className="mb-2">{feature.title}</CardTitle>
-                    <CardDescription className="text-base">
+                    <CardTitle className="mb-1 sm:mb-2 text-lg sm:text-xl">{feature.title}</CardTitle>
+                    <CardDescription className="text-sm sm:text-base">
                       {feature.description}
                     </CardDescription>
                   </CardHeader>
@@ -129,18 +129,18 @@ export default function HomePage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-24 px-6">
+      <section className="py-12 sm:py-24 px-4 sm:px-6">
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true }}
           className="max-w-4xl mx-auto"
         >
-          <Card className="glass-card text-center p-12 ambient-light">
-            <h2 className="font-display text-4xl md:text-5xl font-bold mb-6">
+          <Card className="glass-card text-center p-6 sm:p-12 ambient-light">
+            <h2 className="font-display text-2xl sm:text-4xl md:text-5xl font-bold mb-4 sm:mb-6">
               Ready to get started?
             </h2>
-            <p className="text-xl text-muted-foreground mb-8">
+            <p className="text-base sm:text-xl text-muted-foreground mb-6 sm:mb-8">
               Create your first database in seconds with natural language
             </p>
             <div className="flex justify-center">

@@ -242,7 +242,7 @@ export default function DatabasePage() {
   }
 
   return (
-    <div className="min-h-screen px-6 pt-32 pb-16">
+    <div className="min-h-screen px-4 sm:px-6 pt-24 sm:pt-32 pb-12 sm:pb-16">
       {/* Background Effect */}
       <div className="absolute inset-0 -z-10">
         <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-purple-300 rounded-full mix-blend-multiply filter blur-3xl opacity-10 animate-float" />
@@ -253,47 +253,50 @@ export default function DatabasePage() {
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-8"
+          className="mb-6 sm:mb-8"
         >
           <Button
             variant="ghost"
             onClick={() => router.push("/dashboard")}
-            className="mb-6"
+            className="mb-4 sm:mb-6 text-sm"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Dashboard
           </Button>
 
-          <h1 className="font-display text-5xl font-bold mb-4">
+          <h1 className="font-display text-3xl sm:text-5xl font-bold mb-2 sm:mb-4">
             {database.display_name}
           </h1>
-          <p className="text-xl text-muted-foreground">
+          <p className="text-base sm:text-xl text-muted-foreground">
             {data.length} {data.length === 1 ? "record" : "records"} • {database.schema.fields?.length} fields
           </p>
         </motion.div>
 
         {/* Tabs */}
-        <div className="flex gap-2 mb-6 flex-wrap">
+        <div className="flex gap-2 mb-4 sm:mb-6 flex-wrap">
           <Button
             variant={activeTab === "table" ? "default" : "outline"}
             onClick={() => setActiveTab("table")}
+            className="text-xs sm:text-sm px-2 sm:px-4"
           >
-            <TableIcon className="w-4 h-4 mr-2" />
-            View Data
+            <TableIcon className="w-3 sm:w-4 h-3 sm:h-4 mr-1 sm:mr-2" />
+            <span className="hidden sm:inline">View </span>Data
           </Button>
           <Button
             variant={activeTab === "form" ? "default" : "outline"}
             onClick={() => setActiveTab("form")}
+            className="text-xs sm:text-sm px-2 sm:px-4"
           >
-            <Plus className="w-4 h-4 mr-2" />
-            Add Data
+            <Plus className="w-3 sm:w-4 h-3 sm:h-4 mr-1 sm:mr-2" />
+            Add<span className="hidden sm:inline"> Data</span>
           </Button>
           <Button
             variant={activeTab === "command" ? "default" : "outline"}
             onClick={() => setActiveTab("command")}
+            className="text-xs sm:text-sm px-2 sm:px-4"
           >
-            <Sparkles className="w-4 h-4 mr-2" />
-            AI Query
+            <Sparkles className="w-3 sm:w-4 h-3 sm:h-4 mr-1 sm:mr-2" />
+            AI<span className="hidden sm:inline"> Query</span>
           </Button>
 
           {/* Export Dropdown */}
@@ -302,9 +305,10 @@ export default function DatabasePage() {
               variant="outline"
               onClick={() => setShowExportMenu(!showExportMenu)}
               disabled={exporting || data.length === 0}
+              className="text-xs sm:text-sm px-2 sm:px-4"
             >
-              <Download className="w-4 h-4 mr-2" />
-              {exporting ? "Exporting..." : "Export"}
+              <Download className="w-3 sm:w-4 h-3 sm:h-4 mr-1 sm:mr-2" />
+              {exporting ? "..." : <span className="hidden sm:inline">Export</span>}
             </Button>
 
             {showExportMenu && (
@@ -345,11 +349,11 @@ export default function DatabasePage() {
           {/* Table View */}
           {activeTab === "table" && (
             <Card className="glass-card">
-              <CardContent className="p-6">
+              <CardContent className="p-3 sm:p-6">
                 {data.length === 0 ? (
-                  <div className="text-center py-16">
-                    <TableIcon className="w-16 h-16 text-muted-foreground mx-auto mb-4 opacity-50" />
-                    <p className="text-xl text-muted-foreground mb-4">
+                  <div className="text-center py-10 sm:py-16">
+                    <TableIcon className="w-12 sm:w-16 h-12 sm:h-16 text-muted-foreground mx-auto mb-4 opacity-50" />
+                    <p className="text-base sm:text-xl text-muted-foreground mb-4">
                       No data yet
                     </p>
                     <Button onClick={() => setActiveTab("form")}>
@@ -395,15 +399,15 @@ export default function DatabasePage() {
           {/* Form View */}
           {activeTab === "form" && (
             <Card className="glass-card">
-              <CardHeader>
-                <CardTitle>Add New Record</CardTitle>
-                <CardDescription>
+              <CardHeader className="p-4 sm:p-6">
+                <CardTitle className="text-lg sm:text-xl">Add New Record</CardTitle>
+                <CardDescription className="text-sm">
                   Fill in the fields below to add a new entry
                 </CardDescription>
               </CardHeader>
-              <CardContent>
-                <form onSubmit={handleFormSubmit} className="space-y-6">
-                  <div className="grid md:grid-cols-2 gap-6">
+              <CardContent className="p-4 sm:p-6 pt-0">
+                <form onSubmit={handleFormSubmit} className="space-y-4 sm:space-y-6">
+                  <div className="grid md:grid-cols-2 gap-4 sm:gap-6">
                     {database.schema.fields?.map((field: any) => (
                       <div key={field.name} className="space-y-2">
                         <Label htmlFor={field.name}>
@@ -487,18 +491,18 @@ export default function DatabasePage() {
           {/* AI Chat */}
           {activeTab === "command" && (
             <Card className="glass-card">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Sparkles className="w-5 h-5" />
+              <CardHeader className="p-4 sm:p-6">
+                <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
+                  <Sparkles className="w-4 sm:w-5 h-4 sm:h-5" />
                   AI Assistant
                 </CardTitle>
-                <CardDescription>
+                <CardDescription className="text-sm">
                   Chat with AI to query or modify your data using natural language
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="p-4 sm:p-6 pt-0 space-y-3 sm:space-y-4">
                 {/* Chat Messages */}
-                <div className="h-[400px] overflow-y-auto border rounded-2xl p-4 bg-gray-50/50 dark:bg-gray-800/50 dark:border-gray-700 space-y-4">
+                <div className="h-[300px] sm:h-[400px] overflow-y-auto border rounded-xl sm:rounded-2xl p-3 sm:p-4 bg-gray-50/50 dark:bg-gray-800/50 dark:border-gray-700 space-y-3 sm:space-y-4">
                   {chatMessages.map((msg, index) => (
                       <div
                         key={index}
