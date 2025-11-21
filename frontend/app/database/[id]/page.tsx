@@ -502,7 +502,7 @@ export default function DatabasePage() {
               </CardHeader>
               <CardContent className="p-4 sm:p-6 pt-0 space-y-3 sm:space-y-4">
                 {/* Chat Messages */}
-                <div className="h-[300px] sm:h-[400px] overflow-y-auto border rounded-xl sm:rounded-2xl p-3 sm:p-4 bg-gray-50/50 dark:bg-gray-800/50 dark:border-gray-700 space-y-3 sm:space-y-4">
+                <div className="h-[450px] sm:h-[500px] overflow-y-auto border rounded-xl sm:rounded-2xl p-3 sm:p-4 bg-gray-50/50 dark:bg-gray-800/50 dark:border-gray-700 space-y-3 sm:space-y-4">
                   {chatMessages.map((msg, index) => (
                       <div
                         key={index}
