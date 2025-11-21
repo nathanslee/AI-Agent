@@ -256,10 +256,10 @@ export default function CreateDatabaseWizard() {
 
                 <CardContent className="space-y-6">
                   <div className="p-6 rounded-2xl bg-gradient-purple dark:bg-purple-900/30 border border-purple-200 dark:border-purple-800">
-                    <h3 className="font-display text-2xl font-semibold mb-1">
+                    <h3 className="font-display text-2xl font-semibold mb-1 text-purple-900 dark:text-purple-100">
                       {editedSchema.display_name}
                     </h3>
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-sm text-purple-700 dark:text-purple-300">
                       Table: {editedSchema.database_name}
                     </p>
                   </div>
