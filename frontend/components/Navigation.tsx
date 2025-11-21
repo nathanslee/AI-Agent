@@ -39,12 +39,12 @@ export default function Navigation() {
         scrolled ? "glass shadow-soft" : "bg-transparent"
       }`}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 py-2 sm:py-4">
         <div className="flex items-center justify-between">
           {/* Logo */}
-          <Link href="/" className="flex items-center space-x-2">
-            <div className="w-8 sm:w-10 h-8 sm:h-10 rounded-xl sm:rounded-2xl bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center shadow-glow">
-              <span className="text-white font-bold text-base sm:text-xl">AI</span>
+          <Link href="/" className="flex items-center space-x-1.5 sm:space-x-2">
+            <div className="w-7 sm:w-10 h-7 sm:h-10 rounded-lg sm:rounded-2xl bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center shadow-glow">
+              <span className="text-white font-bold text-sm sm:text-xl">AI</span>
             </div>
             <span className="font-display text-lg sm:text-xl font-semibold hidden sm:block">
               Database Assistant
@@ -52,26 +52,26 @@ export default function Navigation() {
           </Link>
 
           {/* Navigation Links */}
-          <div className="flex items-center gap-2 sm:gap-4">
+          <div className="flex items-center gap-1.5 sm:gap-4">
             <ThemeSwitch />
             {isAuth ? (
               <>
                 <Link href="/dashboard">
-                  <Button variant={pathname === "/dashboard" ? "default" : "ghost"} className="text-xs sm:text-sm px-3 sm:px-6 h-9 sm:h-12">
+                  <Button variant={pathname === "/dashboard" ? "default" : "ghost"} className="text-[10px] sm:text-sm px-2 sm:px-6 h-7 sm:h-12 rounded-lg sm:rounded-2xl">
                     Dashboard
                   </Button>
                 </Link>
-                <Button variant="outline" onClick={handleLogout} className="text-xs sm:text-sm px-3 sm:px-6 h-9 sm:h-12">
+                <Button variant="outline" onClick={handleLogout} className="text-[10px] sm:text-sm px-2 sm:px-6 h-7 sm:h-12 rounded-lg sm:rounded-2xl">
                   Logout
                 </Button>
               </>
             ) : (
               <>
                 <Link href="/login">
-                  <Button variant="ghost" className="font-display text-xs sm:text-sm px-3 sm:px-6 h-9 sm:h-12">Login</Button>
+                  <Button variant="ghost" className="font-display text-[10px] sm:text-sm px-2 sm:px-6 h-7 sm:h-12 rounded-lg sm:rounded-2xl">Login</Button>
                 </Link>
                 <Link href="/signup">
-                  <Button className="font-display text-xs sm:text-sm px-3 sm:px-6 h-9 sm:h-12">Sign Up</Button>
+                  <Button className="font-display text-[10px] sm:text-sm px-2 sm:px-6 h-7 sm:h-12 rounded-lg sm:rounded-2xl">Sign Up</Button>
                 </Link>
               </>
             )}
