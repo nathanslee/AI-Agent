@@ -70,10 +70,10 @@ export default function Navigation() {
             ) : (
               <>
                 <Link href="/login">
-                  <Button variant="ghost" className="font-display text-xs sm:text-sm px-2 sm:px-6 h-8 sm:h-12 rounded-lg sm:rounded-2xl">Login</Button>
+                  <Button variant="ghost" className="text-xs sm:text-sm px-2 sm:px-6 h-8 sm:h-12 rounded-lg sm:rounded-2xl">Login</Button>
                 </Link>
                 <Link href="/signup">
-                  <Button className="font-display text-xs sm:text-sm px-2 sm:px-6 h-8 sm:h-12 rounded-lg sm:rounded-2xl">Sign Up</Button>
+                  <Button className="text-xs sm:text-sm px-2 sm:px-6 h-8 sm:h-12 rounded-lg sm:rounded-2xl">Sign Up</Button>
                 </Link>
               </>
             )}
