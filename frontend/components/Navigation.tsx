@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { removeToken, isAuthenticated } from "@/lib/auth";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import ThemeSwitch from "./ThemeSwitch";
 
 export default function Navigation() {
   const router = useRouter();
@@ -52,6 +53,7 @@ export default function Navigation() {
 
           {/* Navigation Links */}
           <div className="flex items-center gap-4">
+            <ThemeSwitch />
             {isAuth ? (
               <>
                 <Link href="/dashboard">
