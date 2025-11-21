@@ -23,7 +23,7 @@ export default function DatabasePage() {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [activeTab, setActiveTab] = useState<"table" | "form" | "command">("table");
-  const [chatMessages, setChatMessages] = useState<Array<{role: 'user' | 'assistant', content: string, sql?: string}>>([]);
+  const [chatMessages, setChatMessages] = useState<Array<{role: 'user' | 'assistant', content: string, sql?: string, data?: any[]}>>([]);
 
   // Helper function to format field names
   const formatFieldName = (name: string) => {
@@ -175,7 +175,8 @@ export default function DatabasePage() {
       setChatMessages(prev => [...prev, {
         role: 'assistant',
         content: response.data.explanation || 'Command executed successfully!',
-        sql: response.data.sql
+        sql: response.data.sql,
+        data: response.data.data
       }]);
       await loadData();
     } catch (error: any) {
@@ -440,17 +441,52 @@ export default function DatabasePage() {
                         className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
                       >
                         <div
-                          className={`max-w-[80%] p-3 rounded-2xl ${
+                          className={`max-w-[85%] p-3 rounded-2xl ${
                             msg.role === 'user'
                               ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white'
                               : 'bg-white border border-gray-200 shadow-sm'
                           }`}
                         >
                           <p className="text-sm">{msg.content}</p>
+                          {msg.data && msg.data.length > 0 && (
+                            <div className="mt-3 overflow-x-auto">
+                              <table className="w-full text-xs border-collapse">
+                                <thead>
+                                  <tr className="bg-gray-100">
+                                    {Object.keys(msg.data[0]).filter(k => k !== 'id' && k !== 'created_at').map(key => (
+                                      <th key={key} className="p-2 text-left border border-gray-200 font-semibold">
+                                        {formatFieldName(key)}
+                                      </th>
+                                    ))}
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {msg.data.slice(0, 10).map((row, i) => (
+                                    <tr key={i} className="hover:bg-gray-50">
+                                      {Object.entries(row).filter(([k]) => k !== 'id' && k !== 'created_at').map(([key, value]) => (
+                                        <td key={key} className="p-2 border border-gray-200">
+                                          {String(value) || '-'}
+                                        </td>
+                                      ))}
+                                    </tr>
+                                  ))}
+                                </tbody>
+                              </table>
+                              {msg.data.length > 10 && (
+                                <p className="text-xs text-gray-500 mt-2">Showing 10 of {msg.data.length} records</p>
+                              )}
+                            </div>
+                          )}
+                          {msg.data && msg.data.length === 0 && (
+                            <p className="text-xs mt-2 text-gray-500 italic">No records found</p>
+                          )}
                           {msg.sql && (
-                            <p className="text-xs mt-2 font-mono opacity-70 bg-black/10 p-2 rounded">
-                              SQL: {msg.sql}
-                            </p>
+                            <details className="mt-2">
+                              <summary className="text-xs cursor-pointer text-gray-500 hover:text-gray-700">View SQL</summary>
+                              <p className="text-xs mt-1 font-mono bg-gray-100 p-2 rounded">
+                                {msg.sql}
+                              </p>
+                            </details>
                           )}
                         </div>
                       </div>
