@@ -294,7 +294,7 @@ export default function DatabasePage() {
                   <div className="overflow-x-auto">
                     <table className="w-full">
                       <thead>
-                        <tr className="border-b border-gray-200">
+                        <tr className="border-b border-gray-200 dark:border-gray-700">
                           {database.schema.fields?.map((field: any) => (
                             <th
                               key={field.name}
@@ -309,7 +309,7 @@ export default function DatabasePage() {
                         {data.map((row, index) => (
                           <tr
                             key={row.id || index}
-                            className="border-b border-gray-100 hover:bg-white/50 transition-colors"
+                            className="border-b border-gray-100 dark:border-gray-800 hover:bg-white/50 dark:hover:bg-gray-800/50 transition-colors"
                           >
                             {database.schema.fields?.map((field: any) => (
                               <td key={field.name} className="py-3 px-4 text-sm">
@@ -432,7 +432,7 @@ export default function DatabasePage() {
               </CardHeader>
               <CardContent className="space-y-4">
                 {/* Chat Messages */}
-                <div className="h-[400px] overflow-y-auto border rounded-2xl p-4 bg-gray-50/50 space-y-4">
+                <div className="h-[400px] overflow-y-auto border rounded-2xl p-4 bg-gray-50/50 dark:bg-gray-800/50 dark:border-gray-700 space-y-4">
                   {chatMessages.map((msg, index) => (
                       <div
                         key={index}
@@ -442,7 +442,7 @@ export default function DatabasePage() {
                           className={`max-w-[85%] p-3 rounded-2xl ${
                             msg.role === 'user'
                               ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white'
-                              : 'bg-white border border-gray-200 shadow-sm'
+                              : 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-sm'
                           }`}
                         >
                           <div className="text-sm whitespace-pre-wrap" dangerouslySetInnerHTML={{
@@ -454,9 +454,9 @@ export default function DatabasePage() {
                             <div className="mt-3 overflow-x-auto">
                               <table className="w-full text-xs border-collapse">
                                 <thead>
-                                  <tr className="bg-gray-100">
+                                  <tr className="bg-gray-100 dark:bg-gray-700">
                                     {Object.keys(msg.data[0]).filter(k => k !== 'id' && k !== 'created_at').map(key => (
-                                      <th key={key} className="p-2 text-left border border-gray-200 font-semibold">
+                                      <th key={key} className="p-2 text-left border border-gray-200 dark:border-gray-600 font-semibold">
                                         {formatFieldName(key)}
                                       </th>
                                     ))}
@@ -464,9 +464,9 @@ export default function DatabasePage() {
                                 </thead>
                                 <tbody>
                                   {msg.data.slice(0, 10).map((row, i) => (
-                                    <tr key={i} className="hover:bg-gray-50">
+                                    <tr key={i} className="hover:bg-gray-50 dark:hover:bg-gray-700">
                                       {Object.entries(row).filter(([k]) => k !== 'id' && k !== 'created_at').map(([key, value]) => (
-                                        <td key={key} className="p-2 border border-gray-200">
+                                        <td key={key} className="p-2 border border-gray-200 dark:border-gray-600">
                                           {String(value) || '-'}
                                         </td>
                                       ))}
@@ -485,7 +485,7 @@ export default function DatabasePage() {
                           {msg.sql && (
                             <details className="mt-2">
                               <summary className="text-xs cursor-pointer text-gray-500 hover:text-gray-700">View SQL</summary>
-                              <p className="text-xs mt-1 font-mono bg-gray-100 p-2 rounded">
+                              <p className="text-xs mt-1 font-mono bg-gray-100 dark:bg-gray-700 p-2 rounded">
                                 {msg.sql}
                               </p>
                             </details>
@@ -495,11 +495,11 @@ export default function DatabasePage() {
                     ))}
                   {submitting && (
                     <div className="flex justify-start">
-                      <div className="bg-white border border-gray-200 shadow-sm p-3 rounded-2xl">
+                      <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-sm p-3 rounded-2xl">
                         <div className="flex gap-1">
-                          <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-                          <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-                          <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                          <div className="w-2 h-2 bg-gray-400 dark:bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                          <div className="w-2 h-2 bg-gray-400 dark:bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                          <div className="w-2 h-2 bg-gray-400 dark:bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
                         </div>
                       </div>
                     </div>
@@ -513,7 +513,7 @@ export default function DatabasePage() {
                       <button
                         key={index}
                         onClick={() => setNlCommand(cmd)}
-                        className="px-3 py-1.5 rounded-full bg-white border border-gray-200 text-sm hover:bg-purple-50 hover:border-purple-300 transition-all"
+                        className="px-3 py-1.5 rounded-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-sm hover:bg-purple-50 dark:hover:bg-purple-900/30 hover:border-purple-300 dark:hover:border-purple-500 transition-all"
                         disabled={submitting}
                       >
                         {cmd}
