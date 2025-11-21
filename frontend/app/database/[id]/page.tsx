@@ -7,9 +7,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { databaseAPI, dataAPI } from "@/lib/api";
+import { databaseAPI, dataAPI, exportAPI, googleCalendarAPI } from "@/lib/api";
 import { isAuthenticated } from "@/lib/auth";
-import { ArrowLeft, Plus, Send, Table as TableIcon, Sparkles, Wand2 } from "lucide-react";
+import { ArrowLeft, Plus, Send, Table as TableIcon, Sparkles, Wand2, Download, FileText, FileJson, FileSpreadsheet, Calendar, Bell } from "lucide-react";
 
 export default function DatabasePage() {
   const router = useRouter();
@@ -23,6 +23,10 @@ export default function DatabasePage() {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [activeTab, setActiveTab] = useState<"table" | "form" | "command">("table");
+  const [showExportMenu, setShowExportMenu] = useState(false);
+  const [exporting, setExporting] = useState(false);
+  const [googleConnected, setGoogleConnected] = useState(false);
+  const [showCalendarMenu, setShowCalendarMenu] = useState(false);
   const [chatMessages, setChatMessages] = useState<Array<{role: 'user' | 'assistant', content: string, sql?: string, data?: any[]}>>([
     {
       role: 'assistant',
@@ -129,6 +133,7 @@ export default function DatabasePage() {
 
     loadDatabase();
     loadData();
+    checkGoogleStatus();
   }, [dbId]);
 
   const loadDatabase = async () => {
@@ -194,6 +199,80 @@ export default function DatabasePage() {
     }
   };
 
+  const handleExport = async (format: 'csv' | 'json' | 'pdf') => {
+    if (data.length === 0) {
+      alert('No data to export');
+      return;
+    }
+
+    setExporting(true);
+    setShowExportMenu(false);
+
+    try {
+      const filename = database.display_name.replace(/\s+/g, '_');
+      if (format === 'csv') {
+        await exportAPI.downloadCSV(dbId, filename);
+      } else if (format === 'json') {
+        await exportAPI.downloadJSON(dbId, filename);
+      } else {
+        await exportAPI.downloadPDF(dbId, filename);
+      }
+    } catch (error) {
+      console.error('Export failed:', error);
+      alert('Failed to export data');
+    } finally {
+      setExporting(false);
+    }
+  };
+
+  const checkGoogleStatus = async () => {
+    try {
+      const response = await googleCalendarAPI.getStatus();
+      setGoogleConnected(response.data.connected);
+    } catch (error) {
+      console.error('Failed to check Google status:', error);
+    }
+  };
+
+  const connectGoogleCalendar = async () => {
+    try {
+      const response = await googleCalendarAPI.getAuthUrl();
+      window.location.href = response.data.auth_url;
+    } catch (error) {
+      console.error('Failed to get auth URL:', error);
+      alert('Failed to connect to Google Calendar');
+    }
+  };
+
+  const createReminder = async (row: any) => {
+    const expirationField = database.schema.fields?.find(
+      (f: any) => f.name.toLowerCase().includes('expiration') || f.name.toLowerCase().includes('expire')
+    );
+    const nameField = database.schema.fields?.find(
+      (f: any) => f.name.toLowerCase().includes('name') || f.name.toLowerCase().includes('item')
+    );
+
+    if (!expirationField || !row[expirationField.name]) {
+      alert('No expiration date found for this item');
+      return;
+    }
+
+    const itemName = nameField ? row[nameField.name] : 'Item';
+    const expirationDate = row[expirationField.name];
+
+    try {
+      await googleCalendarAPI.createExpirationReminder(itemName, expirationDate, 1);
+      alert(`Reminder created for ${itemName}!`);
+    } catch (error: any) {
+      if (error.response?.data?.detail?.includes('not connected')) {
+        const connect = window.confirm('Google Calendar is not connected. Would you like to connect now?');
+        if (connect) connectGoogleCalendar();
+      } else {
+        alert('Failed to create reminder');
+      }
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center pt-20">
@@ -245,7 +324,7 @@ export default function DatabasePage() {
         </motion.div>
 
         {/* Tabs */}
-        <div className="flex gap-2 mb-6">
+        <div className="flex gap-2 mb-6 flex-wrap">
           <Button
             variant={activeTab === "table" ? "default" : "outline"}
             onClick={() => setActiveTab("table")}
@@ -267,6 +346,80 @@ export default function DatabasePage() {
             <Sparkles className="w-4 h-4 mr-2" />
             AI Query
           </Button>
+
+          {/* Calendar Button */}
+          <div className="relative">
+            <Button
+              variant="outline"
+              onClick={() => setShowCalendarMenu(!showCalendarMenu)}
+            >
+              <Calendar className="w-4 h-4 mr-2" />
+              Calendar
+              {googleConnected && <span className="ml-2 w-2 h-2 bg-green-500 rounded-full"></span>}
+            </Button>
+
+            {showCalendarMenu && (
+              <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 py-2 z-50">
+                {googleConnected ? (
+                  <>
+                    <div className="px-4 py-2 text-xs text-green-600 dark:text-green-400 flex items-center gap-2 border-b border-gray-200 dark:border-gray-700">
+                      <span className="w-2 h-2 bg-green-500 rounded-full"></span>
+                      Google Calendar Connected
+                    </div>
+                    <p className="px-4 py-2 text-xs text-muted-foreground">
+                      Click the bell icon on any row to create a reminder
+                    </p>
+                  </>
+                ) : (
+                  <button
+                    onClick={connectGoogleCalendar}
+                    className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2"
+                  >
+                    <Calendar className="w-4 h-4 text-blue-600" />
+                    Connect Google Calendar
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* Export Dropdown */}
+          <div className="relative ml-auto">
+            <Button
+              variant="outline"
+              onClick={() => setShowExportMenu(!showExportMenu)}
+              disabled={exporting || data.length === 0}
+            >
+              <Download className="w-4 h-4 mr-2" />
+              {exporting ? "Exporting..." : "Export"}
+            </Button>
+
+            {showExportMenu && (
+              <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 py-2 z-50">
+                <button
+                  onClick={() => handleExport('csv')}
+                  className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2"
+                >
+                  <FileSpreadsheet className="w-4 h-4 text-green-600" />
+                  Export as CSV
+                </button>
+                <button
+                  onClick={() => handleExport('json')}
+                  className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2"
+                >
+                  <FileJson className="w-4 h-4 text-yellow-600" />
+                  Export as JSON
+                </button>
+                <button
+                  onClick={() => handleExport('pdf')}
+                  className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2"
+                >
+                  <FileText className="w-4 h-4 text-red-600" />
+                  Export as PDF
+                </button>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Content Area */}
@@ -303,6 +456,13 @@ export default function DatabasePage() {
                               {formatFieldName(field.name)}
                             </th>
                           ))}
+                          {database.schema.fields?.some((f: any) =>
+                            f.name.toLowerCase().includes('expiration') || f.name.toLowerCase().includes('expire')
+                          ) && (
+                            <th className="text-left py-3 px-4 font-semibold text-sm w-16">
+                              Remind
+                            </th>
+                          )}
                         </tr>
                       </thead>
                       <tbody>
@@ -316,6 +476,19 @@ export default function DatabasePage() {
                                 {row[field.name] || "-"}
                               </td>
                             ))}
+                            {database.schema.fields?.some((f: any) =>
+                              f.name.toLowerCase().includes('expiration') || f.name.toLowerCase().includes('expire')
+                            ) && (
+                              <td className="py-3 px-4 text-sm">
+                                <button
+                                  onClick={() => createReminder(row)}
+                                  className="p-1.5 rounded-lg hover:bg-purple-100 dark:hover:bg-purple-900/30 transition-colors"
+                                  title="Create calendar reminder"
+                                >
+                                  <Bell className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+                                </button>
+                              </td>
+                            )}
                           </tr>
                         ))}
                       </tbody>

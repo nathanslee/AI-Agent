@@ -186,8 +186,8 @@ const features = [
   },
   {
     icon: Database,
-    title: "Banking Integration",
-    description: "Connect your bank with Plaid and automatically sync transactions to your databases.",
+    title: "Calendar Reminders",
+    description: "Connect Google Calendar and get automatic reminders for expiration dates and important events.",
   },
   {
     icon: Sparkles,

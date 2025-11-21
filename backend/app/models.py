@@ -71,3 +71,21 @@ class SyncTransactionsRequest(BaseModel):
     db_id: str
     start_date: Optional[str] = None
     end_date: Optional[str] = None
+
+# Google Calendar models
+class GoogleAuthCallbackRequest(BaseModel):
+    code: str
+    state: str
+
+class CreateCalendarEventRequest(BaseModel):
+    title: str
+    description: Optional[str] = ""
+    start_date: str
+    end_date: Optional[str] = None
+    all_day: bool = True
+    reminder_minutes: int = 1440
+
+class CreateExpirationReminderRequest(BaseModel):
+    item_name: str
+    expiration_date: str
+    days_before: int = 1

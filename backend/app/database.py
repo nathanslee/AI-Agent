@@ -69,6 +69,17 @@ class DatabaseManager:
                 )
             """)
 
+            # Google Calendar tokens table
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS google_tokens (
+                    id TEXT PRIMARY KEY,
+                    user_id TEXT UNIQUE NOT NULL,
+                    token_data TEXT NOT NULL,
+                    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+                    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+                )
+            """)
+
             # Create index for better query performance
             cursor.execute("""
                 CREATE INDEX IF NOT EXISTS idx_user_databases_user_id
@@ -77,6 +88,10 @@ class DatabaseManager:
             cursor.execute("""
                 CREATE INDEX IF NOT EXISTS idx_plaid_tokens_user_id
                 ON plaid_tokens(user_id)
+            """)
+            cursor.execute("""
+                CREATE INDEX IF NOT EXISTS idx_google_tokens_user_id
+                ON google_tokens(user_id)
             """)
 
             conn.commit()
@@ -429,6 +444,64 @@ class DatabaseManager:
             )
             row = cursor.fetchone()
             return row["access_token"] if row else None
+        finally:
+            cursor.close()
+            self._release_connection(conn)
+
+    def save_google_token(self, user_id: str, token_data: Dict[str, Any]) -> str:
+        """Save Google Calendar token for user"""
+        token_id = str(uuid.uuid4())
+        conn = self._get_connection()
+
+        try:
+            cursor = conn.cursor()
+            # Upsert - insert or update if exists
+            cursor.execute(
+                """INSERT INTO google_tokens (id, user_id, token_data, created_at)
+                   VALUES (%s, %s, %s, %s)
+                   ON CONFLICT (user_id) DO UPDATE SET
+                   token_data = EXCLUDED.token_data,
+                   created_at = EXCLUDED.created_at""",
+                (token_id, user_id, json.dumps(token_data), datetime.utcnow())
+            )
+            conn.commit()
+            return token_id
+        except Exception as e:
+            conn.rollback()
+            raise e
+        finally:
+            cursor.close()
+            self._release_connection(conn)
+
+    def get_google_token(self, user_id: str) -> Optional[Dict[str, Any]]:
+        """Get Google Calendar token for user"""
+        conn = self._get_connection()
+        try:
+            cursor = conn.cursor(cursor_factory=RealDictCursor)
+            cursor.execute(
+                "SELECT token_data FROM google_tokens WHERE user_id = %s",
+                (user_id,)
+            )
+            row = cursor.fetchone()
+            return json.loads(row["token_data"]) if row else None
+        finally:
+            cursor.close()
+            self._release_connection(conn)
+
+    def delete_google_token(self, user_id: str) -> bool:
+        """Delete Google Calendar token for user"""
+        conn = self._get_connection()
+        try:
+            cursor = conn.cursor()
+            cursor.execute(
+                "DELETE FROM google_tokens WHERE user_id = %s",
+                (user_id,)
+            )
+            conn.commit()
+            return cursor.rowcount > 0
+        except Exception as e:
+            conn.rollback()
+            raise e
         finally:
             cursor.close()
             self._release_connection(conn)

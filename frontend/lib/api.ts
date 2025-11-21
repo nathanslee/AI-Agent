@@ -86,4 +86,76 @@ export const plaidAPI = {
     api.post('/api/plaid/sync-transactions', { db_id: dbId, start_date: startDate, end_date: endDate }),
 };
 
+export const exportAPI = {
+  downloadCSV: async (dbId: string, filename: string) => {
+    const token = localStorage.getItem('token');
+    const response = await fetch(`${API_URL}/api/export/${dbId}/csv`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const blob = await response.blob();
+    downloadBlob(blob, `${filename}.csv`);
+  },
+
+  downloadJSON: async (dbId: string, filename: string) => {
+    const token = localStorage.getItem('token');
+    const response = await fetch(`${API_URL}/api/export/${dbId}/json`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const blob = await response.blob();
+    downloadBlob(blob, `${filename}.json`);
+  },
+
+  downloadPDF: async (dbId: string, filename: string) => {
+    const token = localStorage.getItem('token');
+    const response = await fetch(`${API_URL}/api/export/${dbId}/pdf`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const blob = await response.blob();
+    downloadBlob(blob, `${filename}.pdf`);
+  },
+};
+
+// Helper to trigger file download
+function downloadBlob(blob: Blob, filename: string) {
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  window.URL.revokeObjectURL(url);
+  document.body.removeChild(a);
+}
+
+export const googleCalendarAPI = {
+  getAuthUrl: () =>
+    api.get('/api/google/auth-url'),
+
+  handleCallback: (code: string, state: string) =>
+    api.post('/api/google/callback', { code, state }),
+
+  getStatus: () =>
+    api.get('/api/google/status'),
+
+  createEvent: (title: string, startDate: string, endDate?: string, description?: string, allDay?: boolean, reminderMinutes?: number) =>
+    api.post('/api/google/create-event', {
+      title,
+      start_date: startDate,
+      end_date: endDate,
+      description,
+      all_day: allDay ?? true,
+      reminder_minutes: reminderMinutes ?? 1440
+    }),
+
+  createExpirationReminder: (itemName: string, expirationDate: string, daysBefore?: number) =>
+    api.post('/api/google/create-expiration-reminder', {
+      item_name: itemName,
+      expiration_date: expirationDate,
+      days_before: daysBefore ?? 1
+    }),
+
+  getUpcomingEvents: () =>
+    api.get('/api/google/upcoming-events'),
+};
+
 export default api;

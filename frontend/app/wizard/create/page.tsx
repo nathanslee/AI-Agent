@@ -131,7 +131,7 @@ export default function CreateDatabaseWizard() {
             Create New Database
           </h1>
           <p className="text-xl text-muted-foreground">
-            Describe what you want to track in natural language
+            Describe what you want to track
           </p>
         </motion.div>
 

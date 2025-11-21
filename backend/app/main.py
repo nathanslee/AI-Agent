@@ -1,7 +1,15 @@
 from fastapi import FastAPI, Depends, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import StreamingResponse
 from typing import List
 import os
+import csv
+import json
+import io
+from reportlab.lib import colors
+from reportlab.lib.pagesizes import letter, landscape
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
+from reportlab.lib.styles import getSampleStyleSheet
 
 from .models import (
     SignupRequest, LoginRequest, TokenResponse, UserResponse,
@@ -9,13 +17,15 @@ from .models import (
     ExecuteSQLRequest, NaturalLanguageRequest, InsertDataRequest,
     SuggestExpirationRequest, CategorizeItemRequest,
     ExchangeTokenRequest, SyncTransactionsRequest,
-    GenerateSchemaRequest, CreateDatabaseWithSchemaRequest
+    GenerateSchemaRequest, CreateDatabaseWithSchemaRequest,
+    GoogleAuthCallbackRequest, CreateCalendarEventRequest, CreateExpirationReminderRequest
 )
 from .auth import hash_password, verify_password, create_access_token, get_current_user_id
 from .database import db_manager
 from .ai_agent import ai_agent
 from .sql_validator import sql_validator
 from .plaid_integration import plaid_integration
+from .google_calendar import google_calendar
 
 app = FastAPI(
     title="DataBuddy API",
@@ -318,6 +328,138 @@ async def execute_natural_language(
 
 
 # ============================================================================
+# EXPORT ENDPOINTS
+# ============================================================================
+
+@app.get("/api/export/{db_id}/csv")
+async def export_csv(db_id: str, user_id: str = Depends(get_current_user_id)):
+    """Export database to CSV format"""
+    try:
+        db_info = db_manager.get_database_by_id(db_id, user_id)
+        if not db_info:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Database not found")
+
+        data = db_manager.get_all_data(db_id, user_id)
+
+        if not data:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="No data to export")
+
+        # Create CSV in memory
+        output = io.StringIO()
+        writer = csv.DictWriter(output, fieldnames=data[0].keys())
+        writer.writeheader()
+        writer.writerows(data)
+
+        # Return as streaming response
+        output.seek(0)
+        filename = f"{db_info['display_name'].replace(' ', '_')}.csv"
+
+        return StreamingResponse(
+            iter([output.getvalue()]),
+            media_type="text/csv",
+            headers={"Content-Disposition": f"attachment; filename={filename}"}
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+
+
+@app.get("/api/export/{db_id}/json")
+async def export_json(db_id: str, user_id: str = Depends(get_current_user_id)):
+    """Export database to JSON format"""
+    try:
+        db_info = db_manager.get_database_by_id(db_id, user_id)
+        if not db_info:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Database not found")
+
+        data = db_manager.get_all_data(db_id, user_id)
+
+        # Create JSON with metadata
+        export_data = {
+            "database_name": db_info["display_name"],
+            "exported_at": db_info["created_at"],
+            "record_count": len(data),
+            "records": data
+        }
+
+        output = json.dumps(export_data, indent=2, default=str)
+        filename = f"{db_info['display_name'].replace(' ', '_')}.json"
+
+        return StreamingResponse(
+            iter([output]),
+            media_type="application/json",
+            headers={"Content-Disposition": f"attachment; filename={filename}"}
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+
+
+@app.get("/api/export/{db_id}/pdf")
+async def export_pdf(db_id: str, user_id: str = Depends(get_current_user_id)):
+    """Export database to PDF format"""
+    try:
+        db_info = db_manager.get_database_by_id(db_id, user_id)
+        if not db_info:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Database not found")
+
+        data = db_manager.get_all_data(db_id, user_id)
+
+        if not data:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="No data to export")
+
+        # Create PDF in memory
+        buffer = io.BytesIO()
+        doc = SimpleDocTemplate(buffer, pagesize=landscape(letter))
+        elements = []
+        styles = getSampleStyleSheet()
+
+        # Title
+        title = Paragraph(f"<b>{db_info['display_name']}</b>", styles['Title'])
+        elements.append(title)
+        elements.append(Spacer(1, 20))
+
+        # Prepare table data
+        headers = list(data[0].keys())
+        table_data = [headers]
+
+        for row in data:
+            row_values = [str(v)[:50] if v else "" for v in row.values()]  # Truncate long values
+            table_data.append(row_values)
+
+        # Create table
+        col_widths = [max(70, 700 // len(headers))] * len(headers)
+        table = Table(table_data, colWidths=col_widths)
+        table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#8B5CF6')),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, 0), 10),
+            ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+            ('BACKGROUND', (0, 1), (-1, -1), colors.HexColor('#F5F3FF')),
+            ('TEXTCOLOR', (0, 1), (-1, -1), colors.black),
+            ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
+            ('FONTSIZE', (0, 1), (-1, -1), 8),
+            ('GRID', (0, 0), (-1, -1), 1, colors.HexColor('#E5E7EB')),
+            ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor('#F9FAFB')]),
+        ]))
+        elements.append(table)
+
+        # Build PDF
+        doc.build(elements)
+        buffer.seek(0)
+
+        filename = f"{db_info['display_name'].replace(' ', '_')}.pdf"
+
+        return StreamingResponse(
+            buffer,
+            media_type="application/pdf",
+            headers={"Content-Disposition": f"attachment; filename={filename}"}
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+
+
+# ============================================================================
 # AI SUGGESTION ENDPOINTS
 # ============================================================================
 
@@ -474,6 +616,116 @@ async def sync_plaid_transactions(
             "inserted": inserted_count
         }
 
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+
+
+# ============================================================================
+# GOOGLE CALENDAR INTEGRATION ENDPOINTS
+# ============================================================================
+
+@app.get("/api/google/auth-url")
+async def get_google_auth_url(user_id: str = Depends(get_current_user_id)):
+    """Get Google OAuth authorization URL"""
+    try:
+        auth_url = google_calendar.get_authorization_url(state=user_id)
+        return {"auth_url": auth_url}
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+
+
+@app.post("/api/google/callback")
+async def google_auth_callback(
+    request: GoogleAuthCallbackRequest,
+    user_id: str = Depends(get_current_user_id)
+):
+    """Handle Google OAuth callback"""
+    try:
+        token_data = google_calendar.exchange_code(request.code)
+
+        # Save the token
+        db_manager.save_google_token(user_id, token_data)
+
+        return {"message": "Google Calendar connected successfully"}
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+
+
+@app.get("/api/google/status")
+async def get_google_connection_status(user_id: str = Depends(get_current_user_id)):
+    """Check if Google Calendar is connected"""
+    token = db_manager.get_google_token(user_id)
+    return {"connected": token is not None}
+
+
+@app.post("/api/google/create-event")
+async def create_calendar_event(
+    request: CreateCalendarEventRequest,
+    user_id: str = Depends(get_current_user_id)
+):
+    """Create a Google Calendar event"""
+    try:
+        token_data = db_manager.get_google_token(user_id)
+        if not token_data:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Google Calendar not connected. Please connect first."
+            )
+
+        event = google_calendar.create_event(
+            token_data=token_data,
+            title=request.title,
+            description=request.description,
+            start_date=request.start_date,
+            end_date=request.end_date,
+            all_day=request.all_day,
+            reminder_minutes=request.reminder_minutes
+        )
+
+        return {"message": "Event created successfully", "event": event}
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+
+
+@app.post("/api/google/create-expiration-reminder")
+async def create_expiration_reminder(
+    request: CreateExpirationReminderRequest,
+    user_id: str = Depends(get_current_user_id)
+):
+    """Create a reminder for item expiration"""
+    try:
+        token_data = db_manager.get_google_token(user_id)
+        if not token_data:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Google Calendar not connected. Please connect first."
+            )
+
+        event = google_calendar.create_expiration_reminder(
+            token_data=token_data,
+            item_name=request.item_name,
+            expiration_date=request.expiration_date,
+            days_before=request.days_before
+        )
+
+        return {"message": "Reminder created successfully", "event": event}
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+
+
+@app.get("/api/google/upcoming-events")
+async def get_upcoming_events(user_id: str = Depends(get_current_user_id)):
+    """Get upcoming calendar events"""
+    try:
+        token_data = db_manager.get_google_token(user_id)
+        if not token_data:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Google Calendar not connected. Please connect first."
+            )
+
+        events = google_calendar.list_upcoming_events(token_data)
+        return {"events": events}
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
