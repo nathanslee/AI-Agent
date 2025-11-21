@@ -17,9 +17,9 @@ export default function HomePage() {
   }, []);
 
   return (
-    <div className="relative">
+    <div className="relative overflow-x-hidden">
       {/* Hero Section */}
-      <section className="min-h-screen flex items-center justify-center relative overflow-hidden pt-20">
+      <section className="min-h-screen flex items-center justify-center relative overflow-hidden pt-16 sm:pt-20">
         {/* Ambient Background */}
         <div className="absolute inset-0 -z-10 overflow-hidden">
           <div className="absolute top-1/4 left-1/4 w-48 sm:w-96 h-48 sm:h-96 bg-purple-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-float" />
@@ -30,9 +30,9 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 grid lg:grid-cols-2 gap-6 sm:gap-12 items-center">
           {/* Left Column - Text */}
           <motion.div
-            initial={{ opacity: 0, x: -50 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8 }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
           >
             <h1 className="font-display text-4xl sm:text-5xl md:text-7xl font-bold mb-4 sm:mb-6 leading-tight">
               Build Databases
@@ -67,10 +67,10 @@ export default function HomePage() {
 
           {/* Right Column - Hero Image */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="relative"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            className="relative hidden lg:block"
           >
             <div className="relative w-full aspect-square">
               <Image
@@ -111,12 +111,12 @@ export default function HomePage() {
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1 }}
               >
-                <Card className="glass-card card-3d h-full">
+                <Card className="glass-card card-3d h-full bg-white/80 dark:bg-gray-900/90">
                   <CardHeader className="p-4 sm:p-6">
                     <div className="w-10 sm:w-14 h-10 sm:h-14 rounded-xl sm:rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center mb-3 sm:mb-4 shadow-glow">
                       <feature.icon className="w-5 sm:w-7 h-5 sm:h-7 text-white" />
                     </div>
-                    <CardTitle className="mb-1 sm:mb-2 text-lg sm:text-xl">{feature.title}</CardTitle>
+                    <CardTitle className="mb-1 sm:mb-2 text-lg sm:text-xl text-gray-900 dark:text-gray-100">{feature.title}</CardTitle>
                     <CardDescription className="text-sm sm:text-base">
                       {feature.description}
                     </CardDescription>
@@ -136,8 +136,8 @@ export default function HomePage() {
           viewport={{ once: true }}
           className="max-w-4xl mx-auto"
         >
-          <Card className="glass-card text-center p-6 sm:p-12 ambient-light">
-            <h2 className="font-display text-2xl sm:text-4xl md:text-5xl font-bold mb-4 sm:mb-6">
+          <Card className="glass-card text-center p-6 sm:p-12 ambient-light bg-white/80 dark:bg-gray-900/90">
+            <h2 className="font-display text-2xl sm:text-4xl md:text-5xl font-bold mb-4 sm:mb-6 text-gray-900 dark:text-gray-100">
               Ready to get started?
             </h2>
             <p className="text-base sm:text-xl text-muted-foreground mb-6 sm:mb-8">
