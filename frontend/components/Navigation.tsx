@@ -66,10 +66,10 @@ export default function Navigation() {
             ) : (
               <>
                 <Link href="/login">
-                  <Button variant="ghost">Login</Button>
+                  <Button variant="ghost" className="font-display">Login</Button>
                 </Link>
                 <Link href="/signup">
-                  <Button>Sign Up</Button>
+                  <Button className="font-display">Sign Up</Button>
                 </Link>
               </>
             )}

@@ -39,13 +39,13 @@ export default function HomePage() {
 
             <div className="flex gap-4">
               <Link href="/signup">
-                <Button size="lg" className="group">
+                <Button size="lg" className="group font-display">
                   Get Started
                   <Sparkles className="ml-2 w-4 h-4 group-hover:rotate-12 transition-transform" />
                 </Button>
               </Link>
               <Link href="/login">
-                <Button size="lg" variant="outline">
+                <Button size="lg" variant="outline" className="font-display">
                   Sign In
                 </Button>
               </Link>
