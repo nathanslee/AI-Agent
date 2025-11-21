@@ -113,16 +113,16 @@ export default function DashboardPage() {
           className="mb-6 sm:mb-8"
         >
           <Link href="/wizard/create">
-            <Card className="glass-card card-3d border-2 border-dashed border-primary/30 hover:border-primary/60 cursor-pointer group">
+            <Card className="glass-card card-3d border-2 border-dashed border-primary/30 hover:border-primary/60 cursor-pointer group bg-white/80 dark:bg-gray-900/90">
               <CardContent className="flex items-center justify-center py-10 sm:py-16">
                 <div className="text-center">
                   <div className="w-12 sm:w-16 h-12 sm:h-16 rounded-xl sm:rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center mx-auto mb-3 sm:mb-4 shadow-glow group-hover:scale-110 transition-transform">
                     <Plus className="w-6 sm:w-8 h-6 sm:h-8 text-white" />
                   </div>
-                  <h3 className="font-display text-xl sm:text-2xl font-semibold mb-1 sm:mb-2">
+                  <h3 className="font-display text-xl sm:text-2xl font-semibold mb-1 sm:mb-2 text-gray-900 dark:text-gray-100">
                     Create New Database
                   </h3>
-                  <p className="text-sm sm:text-base text-muted-foreground">
+                  <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">
                     Use natural language to build your custom database
                   </p>
                 </div>
@@ -152,7 +152,7 @@ export default function DashboardPage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1 + 0.2 }}
               >
-                <Card className="glass-card card-3d h-full group relative">
+                <Card className="glass-card card-3d h-full group relative bg-white/80 dark:bg-gray-900/90">
                   <Link href={`/database/${db.id}`} className="block cursor-pointer">
                     <CardHeader className="p-4 sm:p-6">
                       <div className="flex items-start justify-between mb-2">
@@ -163,7 +163,7 @@ export default function DashboardPage() {
                           <button
                             onClick={(e) => handleDelete(db.id, db.display_name, e)}
                             disabled={deletingId === db.id}
-                            className="p-2 rounded-lg hover:bg-red-50 text-muted-foreground hover:text-red-600 transition-colors disabled:opacity-50 z-10"
+                            className="p-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/30 text-muted-foreground hover:text-red-600 transition-colors disabled:opacity-50 z-10"
                             title="Delete database"
                           >
                             <Trash2 className="w-4 h-4" />
@@ -172,7 +172,7 @@ export default function DashboardPage() {
                         </div>
                       </div>
 
-                      <CardTitle className="group-hover:text-primary transition-colors text-base sm:text-lg">
+                      <CardTitle className="group-hover:text-primary transition-colors text-base sm:text-lg text-gray-900 dark:text-gray-100">
                         {db.display_name}
                       </CardTitle>
 
