@@ -23,7 +23,7 @@ export default function DatabasePage() {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [activeTab, setActiveTab] = useState<"table" | "form" | "command">("table");
-  const [commandResult, setCommandResult] = useState<any>(null);
+  const [chatMessages, setChatMessages] = useState<Array<{role: 'user' | 'assistant', content: string, sql?: string}>>([]);
 
   // Helper function to format field names
   const formatFieldName = (name: string) => {
@@ -165,19 +165,24 @@ export default function DatabasePage() {
   const handleNaturalCommand = async () => {
     if (!nlCommand.trim()) return;
 
+    const userMessage = nlCommand.trim();
+    setChatMessages(prev => [...prev, { role: 'user', content: userMessage }]);
+    setNlCommand("");
     setSubmitting(true);
-    setCommandResult(null);
 
     try {
-      const response = await dataAPI.executeNatural(dbId, nlCommand);
-      setCommandResult(response.data);
+      const response = await dataAPI.executeNatural(dbId, userMessage);
+      setChatMessages(prev => [...prev, {
+        role: 'assistant',
+        content: response.data.explanation || 'Command executed successfully!',
+        sql: response.data.sql
+      }]);
       await loadData();
-      setNlCommand("");
     } catch (error: any) {
-      setCommandResult({
-        success: false,
-        error: error.response?.data?.detail || "Failed to execute command",
-      });
+      setChatMessages(prev => [...prev, {
+        role: 'assistant',
+        content: error.response?.data?.detail || "Sorry, I couldn't understand that command. Try rephrasing it."
+      }]);
     } finally {
       setSubmitting(false);
     }
@@ -407,79 +412,96 @@ export default function DatabasePage() {
             </Card>
           )}
 
-          {/* AI Command */}
+          {/* AI Chat */}
           {activeTab === "command" && (
             <Card className="glass-card">
               <CardHeader>
-                <CardTitle>AI Commands</CardTitle>
+                <CardTitle className="flex items-center gap-2">
+                  <Sparkles className="w-5 h-5" />
+                  AI Assistant
+                </CardTitle>
                 <CardDescription>
-                  Use plain English to query or modify your data with AI
+                  Chat with AI to query or modify your data using natural language
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="space-y-2">
-                  <Label htmlFor="command">Your Command</Label>
-                  <div className="flex gap-2">
-                    <Input
-                      id="command"
-                      placeholder='e.g., "Show me all items expiring this week" or "Add bananas bought today"'
-                      value={nlCommand}
-                      onChange={(e) => setNlCommand(e.target.value)}
-                      onKeyPress={(e) => e.key === "Enter" && handleNaturalCommand()}
-                      disabled={submitting}
-                      className="flex-1"
-                    />
-                    <Button
-                      onClick={handleNaturalCommand}
-                      disabled={submitting || !nlCommand.trim()}
-                    >
-                      <Send className="w-4 h-4" />
-                    </Button>
-                  </div>
+              <CardContent className="space-y-4">
+                {/* Chat Messages */}
+                <div className="h-[400px] overflow-y-auto border rounded-2xl p-4 bg-gray-50/50 space-y-4">
+                  {chatMessages.length === 0 ? (
+                    <div className="h-full flex flex-col items-center justify-center text-center text-muted-foreground">
+                      <Sparkles className="w-12 h-12 mb-4 opacity-30" />
+                      <p className="text-lg font-medium mb-2">Start a conversation</p>
+                      <p className="text-sm">Ask me anything about your data!</p>
+                    </div>
+                  ) : (
+                    chatMessages.map((msg, index) => (
+                      <div
+                        key={index}
+                        className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                      >
+                        <div
+                          className={`max-w-[80%] p-3 rounded-2xl ${
+                            msg.role === 'user'
+                              ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white'
+                              : 'bg-white border border-gray-200 shadow-sm'
+                          }`}
+                        >
+                          <p className="text-sm">{msg.content}</p>
+                          {msg.sql && (
+                            <p className="text-xs mt-2 font-mono opacity-70 bg-black/10 p-2 rounded">
+                              SQL: {msg.sql}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    ))
+                  )}
+                  {submitting && (
+                    <div className="flex justify-start">
+                      <div className="bg-white border border-gray-200 shadow-sm p-3 rounded-2xl">
+                        <div className="flex gap-1">
+                          <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                          <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                          <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
-                {commandResult && (
-                  <div
-                    className={`p-4 rounded-2xl border ${
-                      commandResult.success
-                        ? "bg-green-50 border-green-200"
-                        : "bg-red-50 border-red-200"
-                    }`}
-                  >
-                    {commandResult.success ? (
-                      <div className="space-y-2">
-                        <p className="font-semibold text-green-900">
-                          ✓ Success
-                        </p>
-                        <p className="text-sm text-green-800">
-                          {commandResult.explanation}
-                        </p>
-                        <p className="text-xs text-green-700 font-mono bg-green-100 p-2 rounded">
-                          SQL: {commandResult.sql}
-                        </p>
-                      </div>
-                    ) : (
-                      <p className="text-red-600">{commandResult.error}</p>
-                    )}
-                  </div>
-                )}
-
-                <div className="space-y-2">
-                  <p className="text-sm font-medium text-muted-foreground">
-                    Try these examples:
-                  </p>
-                  <div className="grid gap-2">
+                {/* Quick Actions */}
+                {chatMessages.length === 0 && (
+                  <div className="flex flex-wrap gap-2">
                     {exampleCommands.map((cmd, index) => (
                       <button
                         key={index}
                         onClick={() => setNlCommand(cmd)}
-                        className="text-left p-3 rounded-2xl bg-white/50 hover:bg-white border border-gray-200 text-sm transition-all hover:shadow-soft"
+                        className="px-3 py-1.5 rounded-full bg-white border border-gray-200 text-sm hover:bg-purple-50 hover:border-purple-300 transition-all"
                         disabled={submitting}
                       >
                         {cmd}
                       </button>
                     ))}
                   </div>
+                )}
+
+                {/* Input */}
+                <div className="flex gap-2">
+                  <Input
+                    placeholder="Ask anything about your data..."
+                    value={nlCommand}
+                    onChange={(e) => setNlCommand(e.target.value)}
+                    onKeyPress={(e) => e.key === "Enter" && handleNaturalCommand()}
+                    disabled={submitting}
+                    className="flex-1"
+                  />
+                  <Button
+                    onClick={handleNaturalCommand}
+                    disabled={submitting || !nlCommand.trim()}
+                    className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
+                  >
+                    <Send className="w-4 h-4" />
+                  </Button>
                 </div>
               </CardContent>
             </Card>
