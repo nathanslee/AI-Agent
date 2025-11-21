@@ -1,13 +1,21 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Database, Sparkles, Zap, Shield } from "lucide-react";
+import { isAuthenticated } from "@/lib/auth";
 
 export default function HomePage() {
+  const [isAuth, setIsAuth] = useState(false);
+
+  useEffect(() => {
+    setIsAuth(isAuthenticated());
+  }, []);
+
   return (
     <div className="relative">
       {/* Hero Section */}
@@ -38,7 +46,7 @@ export default function HomePage() {
             </p>
 
             <div className="flex gap-4">
-              <Link href="/signup">
+              <Link href={isAuth ? "/dashboard" : "/signup"}>
                 <button className="relative group overflow-hidden px-6 h-12 rounded-full flex space-x-2 items-center bg-gradient-to-r from-pink-500 to-purple-500 hover:to-purple-600">
                   <span className="relative text-sm text-white font-display">Get Started</span>
                   <div className="flex items-center -space-x-3 translate-x-3">
@@ -136,7 +144,7 @@ export default function HomePage() {
               Create your first database in seconds with natural language
             </p>
             <div className="flex justify-center">
-              <Link href="/signup">
+              <Link href={isAuth ? "/dashboard" : "/signup"}>
                 <button className="relative group overflow-hidden px-6 h-12 rounded-full flex space-x-2 items-center bg-gradient-to-r from-pink-500 to-purple-500 hover:to-purple-600">
                   <span className="relative text-sm text-white font-display">Start Building Now</span>
                   <div className="flex items-center -space-x-3 translate-x-3">
