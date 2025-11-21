@@ -70,9 +70,9 @@ export default function HomePage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.1 }}
-            className="relative hidden lg:block"
+            className="relative"
           >
-            <div className="relative w-full aspect-square">
+            <div className="relative w-48 h-48 sm:w-64 sm:h-64 md:w-80 md:h-80 lg:w-full lg:aspect-square mx-auto">
               <Image
                 src="/hero-image.png"
                 alt="AI Database Management Illustration"
