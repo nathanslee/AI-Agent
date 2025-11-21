@@ -53,7 +53,7 @@ export default function Navigation() {
 
           {/* Navigation Links */}
           <div className="flex items-center gap-2 sm:gap-4 flex-shrink-0">
-            <div className="scale-[0.65] sm:scale-100 origin-right -mr-2 sm:mr-0">
+            <div className="scale-[0.65] sm:scale-100 origin-right mr-1 sm:mr-0">
               <ThemeSwitch />
             </div>
             {isAuth ? (
