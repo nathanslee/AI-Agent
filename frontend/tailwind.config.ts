@@ -42,8 +42,8 @@ const config: Config = {
         },
       },
       fontFamily: {
-        display: ["Inter Tight", "Inter", "sans-serif"],
-        body: ["Inter", "sans-serif"],
+        display: ["var(--font-dm-sans)", "Inter Tight", "sans-serif"],
+        body: ["var(--font-dm-sans)", "Inter", "sans-serif"],
       },
       borderRadius: {
         lg: "var(--radius)",

@@ -48,6 +48,9 @@
   body {
     @apply bg-background text-foreground font-body antialiased transition-colors duration-300;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    font-size: 15px;
+    line-height: 1.6;
+    letter-spacing: -0.01em;
   }
 
   h1, h2, h3, h4, h5, h6 {

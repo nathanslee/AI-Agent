@@ -1,7 +1,13 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { DM_Sans, Inter } from "next/font/google";
 import "./globals.css";
 import Navigation from "@/components/Navigation";
+
+const dmSans = DM_Sans({
+  subsets: ["latin"],
+  variable: "--font-dm-sans",
+  weight: ["400", "500", "600", "700"],
+});
 
 const inter = Inter({
   subsets: ["latin"],
@@ -20,7 +26,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={inter.variable}>
+      <body className={`${dmSans.variable} ${inter.variable}`}>
         <Navigation />
         <main className="min-h-screen">
           {children}
