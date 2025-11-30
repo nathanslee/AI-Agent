@@ -1,0 +1,26 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(python -m venv:*)",
+      "Bash(venvScriptspip install -r requirements.txt)",
+      "Bash(\"./venv/Scripts/pip\" install -r requirements.txt)",
+      "Bash(venvScriptsactivate)",
+      "Bash(uvicorn:*)",
+      "Bash(npm run dev:*)",
+      "Bash(venv/Scripts/python:*)",
+      "Bash(\"./venv/Scripts/pip\" install --upgrade openai)",
+      "Bash(backend/app/database.py)",
+      "Bash(timeout /t 3)",
+      "Bash(nul)",
+      "Bash(exit 0)",
+      "Bash(copy:*)",
+      "Bash(git push:*)",
+      "Bash(\"C:\\Users\\Nate\\AI Agent\\backend\\runtime.txt\")",
+      "Bash(findstr:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

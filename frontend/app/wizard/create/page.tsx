@@ -255,7 +255,7 @@ export default function CreateDatabaseWizard() {
                 </CardHeader>
 
                 <CardContent className="p-4 sm:p-6 pt-0 space-y-4 sm:space-y-6">
-                  <div className="p-4 sm:p-6 rounded-xl sm:rounded-2xl bg-gradient-purple dark:bg-purple-900/30 border border-purple-200 dark:border-purple-800">
+                  <div className="p-4 sm:p-6 rounded-xl sm:rounded-2xl bg-gradient-purple dark:bg-none dark:bg-purple-900/30 border border-purple-200 dark:border-purple-800">
                     <h3 className="font-display text-lg sm:text-2xl font-semibold mb-1 text-purple-900 dark:text-purple-100">
                       {editedSchema.display_name}
                     </h3>
